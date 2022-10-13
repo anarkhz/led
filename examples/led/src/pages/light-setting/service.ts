@@ -34,38 +34,6 @@ const recommend = {
         brightness: 100,
       },
     },
-    {
-      text: 'R:B=2:1',
-      setting: {
-        R: 20,
-        B: 10,
-        brightness: 100,
-      },
-    },
-    {
-      text: 'R:B=2:2',
-      setting: {
-        R: 20,
-        B: 20,
-        brightness: 100,
-      },
-    },
-    {
-      text: 'R:B=3:3',
-      setting: {
-        R: 30,
-        B: 30,
-        brightness: 100,
-      },
-    },
-    {
-      text: 'R:B=4:4',
-      setting: {
-        R: 40,
-        B: 40,
-        brightness: 100,
-      },
-    },
   ],
 };
 

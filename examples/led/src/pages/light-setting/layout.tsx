@@ -1,145 +1,40 @@
 import _ from 'lodash';
 import { StyleSheet, View, Image, ScrollView } from 'react-native';
-import { TYSdk, Utils, Button, TYText, Slider, Stepper, SwitchButton } from 'tuya-panel-kit';
+import {
+  TYSdk,
+  Utils,
+  Button,
+  TYText,
+  Slider,
+  Stepper,
+  SwitchButton,
+  Popup,
+  Dialog,
+} from 'tuya-panel-kit';
 import React from 'react';
 import { commonStyles } from 'style/common';
 
-// import { useDispatch } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { useSelector, actions } from '@models';
 
 // import { useSettingConfig } from './service';
 
-import { color } from '@config';
+import { color, productConfig } from '@config';
 import Res from '@res';
 
 const { convertX: cx, width: deviceWidth, height: deviceHeight } = Utils.RatioUtils;
 
-const defaultConfig = {
-  recommend: [
-    {
-      text: 'R:B=1:1',
-      setting: {
-        red_bright_value: 10,
-        blue_bright_value: 10,
-        purple_bright_value: 10,
-        uvc_bright_value: 10,
-        bright_value: 10,
-      },
-    },
-    {
-      text: 'R:B=1:2',
-      setting: {
-        red_bright_value: 10,
-        blue_bright_value: 10,
-        purple_bright_value: 10,
-        uvc_bright_value: 10,
-        bright_value: 20,
-      },
-    },
-    {
-      text: 'R:B=1:3',
-      setting: {
-        red_bright_value: 10,
-        blue_bright_value: 10,
-        purple_bright_value: 10,
-        uvc_bright_value: 10,
-        bright_value: 30,
-      },
-    },
-    {
-      text: 'R:B=1:4',
-      setting: {
-        red_bright_value: 10,
-        blue_bright_value: 10,
-        purple_bright_value: 10,
-        uvc_bright_value: 10,
-        bright_value: 40,
-      },
-    },
-    {
-      text: 'R:B=2:1',
-      setting: {
-        red_bright_value: 20,
-        blue_bright_value: 10,
-        purple_bright_value: 10,
-        uvc_bright_value: 10,
-        bright_value: 10,
-      },
-    },
-    {
-      text: 'R:B=2:2',
-      setting: {
-        red_bright_value: 30,
-        blue_bright_value: 10,
-        purple_bright_value: 10,
-        uvc_bright_value: 10,
-        bright_value: 10,
-      },
-    },
-    {
-      text: 'R:B=3:3',
-      setting: {
-        red_bright_value: 40,
-        blue_bright_value: 10,
-        purple_bright_value: 10,
-        uvc_bright_value: 10,
-        bright_value: 10,
-      },
-    },
-    {
-      text: 'R:B=4:4',
-      setting: {
-        red_bright_value: 50,
-        blue_bright_value: 10,
-        purple_bright_value: 10,
-        uvc_bright_value: 10,
-        bright_value: 10,
-      },
-    },
-  ],
-  schema: [
-    'red_bright_value',
-    'blue_bright_value',
-    'purple_bright_value',
-    'uvc_bright_value',
-    'bright_value',
-  ],
-};
-
-const Recommend: React.FC = () => {
-  const handleButtonClick = setting => {
-    TYSdk.device.putDeviceData(setting);
-  };
-
-  const renderButtonItems = defaultConfig.recommend.map(item => (
-    <Button
-      textStyle={styles.buttonItemText}
-      style={styles.buttonItem}
-      text={item.text}
-      onPress={() => handleButtonClick(item.setting)}
-    ></Button>
-  ));
-
-  return (
-    <View style={commonStyles.card}>
-      <TYText
-        style={{
-          fontSize: 18,
-          marginBottom: cx(8),
-          color: color.text,
-        }}
-        text="光质推荐"
-      />
-      <View style={styles.buttonList}>{renderButtonItems}</View>
-    </View>
-  );
-};
-
-const Control: React.FC = () => {
+const Layout: React.FC = () => {
   const dpState = useSelector(state => state.dpState);
   const devInfo = useSelector(state => state.devInfo);
+  const current = useSelector(state => state.product.current);
+  const dispatch = useDispatch();
+  const [recommendSource, setRecommendSource] = React.useState(Res.cat);
 
-  const getItemLabel = key => {
+  /**
+   * Getters
+   */
+  const controlItemLabelGetter = key => {
     if (devInfo.schema && devInfo.schema[key] && devInfo.schema[key].name) {
       return devInfo.schema[key].name;
     } else {
@@ -147,72 +42,149 @@ const Control: React.FC = () => {
     }
   };
 
-  const getItemValue = key => {
+  const controlItemValueGetter = key => {
     return Math.round(dpState[key] / 10);
   };
 
-  const handleValueChange = _.debounce((key, value) => {
+  /**
+   * Handlers
+   */
+  const handleRecommendPress = item => {
+    TYSdk.device.putDeviceData(item.setting);
+    setRecommendSource(item.img);
+  };
+
+  const handleControlValueChange = _.debounce((key, value) => {
     TYSdk.device.putDeviceData({ [key]: Math.round(value) * 10 });
+    setRecommendSource(Res.cat);
   }, 200);
 
-  return (
-    <View style={commonStyles.card}>
-      <TYText text="自定义" size={18} />
-      {defaultConfig.schema.map(key => (
-        <View
-          style={{
-            display: 'flex',
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-          }}
-        >
-          <TYText style={{ width: cx(96) }} text={getItemLabel(key)} size={18} />
-          <Slider.Horizontal
-            theme={{
-              trackRadius: 3,
-              trackHeight: 6,
-              thumbSize: 26,
-              thumbRadius: 26,
-              thumbTintColor: '#FFF',
-              minimumTrackTintColor: '#F84803',
-              maximumTrackTintColor: '#E5E5E5',
-            }}
-            maximumValue={100}
-            minimumValue={0}
-            style={{ width: cx(120), height: cx(36) }}
-            value={getItemValue(key)}
-            onSlidingComplete={v => handleValueChange(key, v)}
-          />
-          <Stepper
-            style={{
-              width: cx(92),
-            }}
-            max={100}
-            min={0}
-            buttonStyle={styles.stepButtonStyle}
-            inputStyle={styles.stepInputStyle}
-            editable={true}
-            value={getItemValue(key)}
-            onValueChange={v => handleValueChange(key, v)}
-          />
+  const handlePressMore = () => {
+    Popup.list({
+      type: 'radio',
+      dataSource: [
+        {
+          key: '0',
+          title: '切换产品',
+          value: 'switch-product',
+        },
+      ],
+      title: '请选择',
+      cancelText: '取消',
+      selectedIcon: <View></View>,
+      footerType: 'singleCancel',
+      onMaskPress: ({ close }) => close(),
+      onSelect: (value, { close: popupClose }) => {
+        if (value === 'switch-product') {
+          Dialog.checkbox({
+            title: '请选择',
+            cancelText: '取消',
+            confirmText: '确认',
+            type: 'radio',
+            maxItemNum: 7,
+            value: current,
+            dataSource: productConfig.listSchema,
+            onConfirm: (value, { close: dialogClose }) => {
+              dispatch(actions.product.changeCurrent(value));
+              // setLoopDays(value);
+              dialogClose();
+              popupClose();
+            },
+          });
+        }
+      },
+    });
+  };
+
+  /**
+   * Renders
+   */
+  const renderRecommend = () => {
+    if (productConfig.recommend[current] && productConfig.recommend[current].length > 0) {
+      return (
+        <View>
+          <View style={commonStyles.card}>
+            <TYText
+              style={{
+                fontSize: 18,
+                marginBottom: cx(8),
+                color: color.text,
+              }}
+              text="光质推荐"
+            />
+            <View style={styles.buttonList}>
+              {productConfig.recommend[current].map(item => (
+                <Button
+                  textStyle={styles.buttonItemText}
+                  style={styles.buttonItem}
+                  text={item.text}
+                  onPress={() => handleRecommendPress(item)}
+                ></Button>
+              ))}
+            </View>
+          </View>
+          <View style={[commonStyles.card, { padding: 0 }]}>
+            <Image style={styles.banner} source={recommendSource} />
+          </View>
         </View>
-      ))}
-    </View>
-  );
-};
+      );
+    } else {
+      return null;
+    }
+  };
 
-const Layout: React.FC = () => {
-  const dpState = useSelector(state => state.dpState);
+  const renderControl = () => {
+    return (
+      <View style={commonStyles.card}>
+        <TYText text="自定义" size={18} />
+        {productConfig.controlSchema[current].map(key => (
+          <View
+            style={{
+              display: 'flex',
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+            }}
+          >
+            <TYText style={{ width: cx(96) }} text={controlItemLabelGetter(key)} size={18} />
+            <Slider.Horizontal
+              theme={{
+                trackRadius: 3,
+                trackHeight: 6,
+                thumbSize: 26,
+                thumbRadius: 26,
+                thumbTintColor: '#FFF',
+                minimumTrackTintColor: '#F84803',
+                maximumTrackTintColor: '#E5E5E5',
+              }}
+              maximumValue={100}
+              minimumValue={1}
+              style={{ width: cx(120), height: cx(36) }}
+              value={controlItemValueGetter(key)}
+              onSlidingComplete={v => handleControlValueChange(key, v)}
+            />
+            <Stepper
+              style={{
+                width: cx(92),
+              }}
+              max={100}
+              min={1}
+              buttonStyle={styles.stepButtonStyle}
+              inputStyle={styles.stepInputStyle}
+              editable={true}
+              value={controlItemValueGetter(key)}
+              onValueChange={v => handleControlValueChange(key, v)}
+            />
+          </View>
+        ))}
+      </View>
+    );
+  };
 
-  return (
-    <View style={{ flex: 1 }}>
-      <ScrollView>
-        <Recommend />
-        <Image style={styles.banner} source={Res.cat} />
-        <Control />
+  const renderOperation = () => {
+    return (
+      <View style={[commonStyles.card, commonStyles.line]}>
         <SwitchButton
-          style={styles.switch}
           size={{
             activeSize: 34,
             margin: 3,
@@ -227,6 +199,22 @@ const Layout: React.FC = () => {
           onValueChange={v => TYSdk.device.putDeviceData({ switch_led: v })}
           tintColor="#E5E5E5"
         />
+        <Button
+          style={[commonStyles.button, { width: cx(120) }]}
+          textStyle={commonStyles.buttonText}
+          text="更多操作"
+          onPress={handlePressMore}
+        ></Button>
+      </View>
+    );
+  };
+
+  return (
+    <View style={{ flex: 1 }}>
+      <ScrollView>
+        {renderRecommend()}
+        {renderControl()}
+        {renderOperation()}
       </ScrollView>
     </View>
   );
@@ -268,6 +256,7 @@ const styles = StyleSheet.create({
   banner: {
     alignSelf: 'center',
     width: deviceWidth - cx(32),
+    height: cx(160),
     marginVertical: cx(16),
   },
   /**
@@ -285,7 +274,7 @@ const styles = StyleSheet.create({
   switch: {
     alignSelf: 'flex-end',
     paddingHorizontal: cx(16),
-    marginBottom: cx(36),
+    // marginBottom: cx(36),
   },
 });
 

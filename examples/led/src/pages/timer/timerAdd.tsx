@@ -134,7 +134,7 @@ const Layout: React.FC = () => {
               popupClose();
             } else if (value === 'custom') {
               Dialog.checkbox({
-                title: 'Required',
+                title: '请选择',
                 cancelText: '取消',
                 confirmText: '确认',
                 type: 'switch',

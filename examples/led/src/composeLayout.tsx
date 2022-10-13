@@ -25,6 +25,8 @@ const composeLayout = (store: Store, component: React.ComponentType) => {
   const NavigatorLayout = component;
   const { dispatch } = store;
 
+  // const [storagePrepared, setStoragePrepared] = React.useState(false);
+
   /**
    * 此处监听了`设备数据变更`事件，
    * 每当dp点数据变更时，会将变更的dp点状态同步更新到`redux`中去。
@@ -59,6 +61,11 @@ const composeLayout = (store: Store, component: React.ComponentType) => {
      */
     constructor(props: Props) {
       super(props);
+
+      this.state = {
+        storagePrepared: false,
+      };
+
       if (props && props.devInfo && props.devInfo.devId) {
         TYDevice.setDeviceInfo(props.devInfo);
         TYDevice.getDeviceInfo()
@@ -77,42 +84,44 @@ const composeLayout = (store: Store, component: React.ComponentType) => {
         TYDevice.getDeviceInfo().then(data => dispatch(actions.common.devInfoChange(data)));
       }
 
+      setTimeout(() => {
+        this.setState({ storagePrepared: true });
+      }, 0);
+
       // FIXME: 注入初始状态
       async function initLocal() {
-        const current = 'RB';
+        // const current = 'RB';
         // const current = await AsyncStorage.getItem('current');
         // // alert('ccur=' + current);
-        setTimeout(() => {
-          dispatch(actions.product.changeCurrent(current));
-        }, 500);
-
-        const gradientTime = await AsyncStorage.getItem(`${current}_gradientTime`);
-        const lightSetting = await AsyncStorage.getItem(`${current}_lightSetting`);
-        const switchValue = await AsyncStorage.getItem(`${current}_switch`);
-        const scene = await AsyncStorage.getItem(`${current}_scene`);
-        const timer = await AsyncStorage.getItem(`${current}_timer`);
-
-        setTimeout(() => {
-          dispatch(actions.product.changeGradientTime(Number(gradientTime)));
-          if (lightSetting) {
-            dispatch(actions.product.changeLightSetting(JSON.parse(lightSetting)));
-          }
-          dispatch(actions.product.changeSwitch(switchValue === 'on' ? true : false));
-          if (scene) {
-            dispatch(
-              actions.product.initScene({
-                scene: JSON.parse(scene),
-              })
-            );
-          }
-          if (timer) {
-            dispatch(
-              actions.product.initTimer({
-                timer: JSON.parse(timer),
-              })
-            );
-          }
-        }, 500);
+        // setTimeout(() => {
+        //   dispatch(actions.product.changeCurrent(current));
+        // }, 500);
+        // const gradientTime = await AsyncStorage.getItem(`${current}_gradientTime`);
+        // const lightSetting = await AsyncStorage.getItem(`${current}_lightSetting`);
+        // // const switchValue = await AsyncStorage.getItem(`${current}_switch`);
+        // const scene = await AsyncStorage.getItem(`${current}_scene`);
+        // const timer = await AsyncStorage.getItem(`${current}_timer`);
+        // setTimeout(() => {
+        //   dispatch(actions.product.changeGradientTime(Number(gradientTime)));
+        //   if (lightSetting) {
+        //     dispatch(actions.product.changeLightSetting(JSON.parse(lightSetting)));
+        //   }
+        //   // dispatch(actions.product.changeSwitch(switchValue === 'on' ? true : false));
+        //   if (scene) {
+        //     dispatch(
+        //       actions.product.initScene({
+        //         scene: JSON.parse(scene),
+        //       })
+        //     );
+        //   }
+        //   if (timer) {
+        //     dispatch(
+        //       actions.product.initTimer({
+        //         timer: JSON.parse(timer),
+        //       })
+        //     );
+        //   }
+        // }, 500);
       }
 
       initLocal();
@@ -126,7 +135,7 @@ const composeLayout = (store: Store, component: React.ComponentType) => {
               {({ mapStateToProps, ...props }: { mapStateToProps: any; [prop: string]: any }) => {
                 const hasInit = Object.keys(props.dpState).length > 0;
                 // return hasInit ? <NavigatorLayout {...props} /> : null;
-                if (hasInit) {
+                if (hasInit && this.state.storagePrepared) {
                   return (
                     <View style={{ flex: 1 }}>
                       <NavigatorLayout {...props} />

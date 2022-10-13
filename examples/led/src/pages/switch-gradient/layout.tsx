@@ -1,5 +1,5 @@
 import { StyleSheet, View, ScrollView, TextInput } from 'react-native';
-import { Utils, Button, Popup, TYText, Slider, Stepper, SwitchButton } from 'tuya-panel-kit';
+import { TYSdk, Utils, Button, TYText, Slider, Stepper } from 'tuya-panel-kit';
 import React from 'react';
 
 import { useDispatch } from 'react-redux';
@@ -11,63 +11,67 @@ import { timeRecommend } from './service';
 const { convertX: cx } = Utils.RatioUtils;
 
 const Layout: React.FC = () => {
-  const [inputVal, setInputVal] = React.useState('');
+  const [openTime, setOpenTime] = React.useState(0);
 
-  const product = useSelector(state => state.product);
-  const dispatch = useDispatch();
-
-  function getTime() {
-    const current = product.current;
-    if (current) {
-      return product[current + '_gradientTime'];
-    } else {
-      return 0;
-    }
-  }
-
+  /**
+   * Handlers
+   */
   function handleTimeChange(time) {
-    if (Math.round(time) !== getTime()) {
-      dispatch(actions.product.changeGradientTime(Math.round(time)));
-      if (Math.round(time) === 0) {
-        setInputVal('');
-      } else {
-        setInputVal(Math.round(time).toString());
-      }
-    }
+    setOpenTime(Math.round(time));
+    handlePutData(time);
   }
+
   function handleInputChange(text) {
-    if (Math.round(text) > 180) {
-      dispatch(actions.product.changeGradientTime(180));
-      setInputVal('180');
-    } else if (Math.round(text) !== getTime()) {
-      setInputVal(text);
-      dispatch(actions.product.changeGradientTime(Math.round(text)));
-    }
+    const time = Math.round(text) > 180 ? 180 : Math.round(text);
+    setOpenTime(time);
+    handlePutData(time);
   }
 
-  const renderButtons = timeRecommend.map(item => (
-    <Button
-      textStyle={styles.buttonItemText}
-      style={styles.buttonItem}
-      text={item + 'min'}
-      onPress={() => handleTimeChange(item)}
-    ></Button>
-  ));
+  function handlePutData(time) {
+    TYSdk.device.putDeviceData({
+      switch_gradient:
+        '00' +
+        (Math.round(time) * 60).toString(16).padStart(6, '0') +
+        (Math.round(time) * 60).toString(16).padStart(6, '0'),
+    });
+  }
 
-  return (
-    <View style={commonStyles.card}>
+  /**
+   * Renders
+   */
+  const renderHeader = () => {
+    return (
       <View style={commonStyles.line}>
-        <TYText>开关渐变</TYText>
+        <TYText text="开关渐变" size={18} />
         <TextInput
           style={styles.titleInput}
           keyboardType="numeric"
           maxLength={3}
           placeholder="请输入渐变时间（分钟）"
-          value={inputVal}
+          value={openTime.toString()}
           onChangeText={handleInputChange}
         ></TextInput>
       </View>
-      <View style={[commonStyles.line, commonStyles.mt8]}>{renderButtons}</View>
+    );
+  };
+
+  const renderRecommend = () => {
+    return (
+      <View style={[commonStyles.line, commonStyles.mt8]}>
+        {timeRecommend.map(item => (
+          <Button
+            textStyle={styles.buttonItemText}
+            style={styles.buttonItem}
+            text={item + 'min'}
+            onPress={() => handleTimeChange(item)}
+          ></Button>
+        ))}
+      </View>
+    );
+  };
+
+  const renderSliderBar = () => {
+    return (
       <View
         style={{
           display: 'flex',
@@ -76,7 +80,7 @@ const Layout: React.FC = () => {
           justifyContent: 'space-between',
         }}
       >
-        <TYText style={{ paddingHorizontal: cx(16) }} text="R" size={18} />
+        <TYText style={{ paddingHorizontal: cx(16) }} text="时间" size={18} />
         <Slider.Horizontal
           theme={{
             trackRadius: 3,
@@ -90,9 +94,8 @@ const Layout: React.FC = () => {
           maximumValue={180}
           minimumValue={0}
           style={{ width: cx(160), height: cx(36) }}
-          value={getTime()}
-          onValueChange={handleTimeChange}
-          // onSlidingComplete={v => setValue(Math.round(v))}
+          value={openTime}
+          onSlidingComplete={handleTimeChange}
         />
         <Stepper
           style={{
@@ -102,11 +105,19 @@ const Layout: React.FC = () => {
           min={0}
           buttonStyle={styles.stepButtonStyle}
           inputStyle={styles.stepInputStyle}
-          value={getTime()}
+          value={openTime}
           editable={true}
           onValueChange={handleTimeChange}
         />
       </View>
+    );
+  };
+
+  return (
+    <View style={commonStyles.card}>
+      {renderHeader()}
+      {renderRecommend()}
+      {renderSliderBar()}
     </View>
   );
 };
