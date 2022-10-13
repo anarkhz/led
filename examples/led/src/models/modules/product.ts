@@ -118,6 +118,7 @@ export const actions = {
 
 export const reducers = {
   product(state = productState, action) {
+    console.log(JSON.stringify(state));
     switch (action.type) {
       case 'CHANGE_FOOTER_VISIBLE': {
         return {

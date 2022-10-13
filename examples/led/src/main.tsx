@@ -31,7 +31,7 @@ AsyncStorage.setItem('current', 'RB');
 const routers = [
   {
     id: 'main',
-    title: 'Main',
+    title: '灯光设置',
     hideFooter: false,
     component: props => <LightSetting {...props} />,
   },
@@ -45,11 +45,11 @@ const routers = [
     title: 'Switch Gradient',
     component: props => <SwitchGradient {...props} />,
   },
-  {
-    id: 'light-setting',
-    title: 'Setting',
-    component: props => <LightSetting {...props} />,
-  },
+  // {
+  //   id: 'light-setting',
+  //   title: 'Setting',
+  //   component: props => <LightSetting {...props} />,
+  // },
   {
     id: 'scene',
     title: 'Scene',

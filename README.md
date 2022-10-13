@@ -1,36 +1,68 @@
-# Tuya Panel Basic Template（React Native 0.59）
+# Tuya Panel Templates
 
 English | [简体中文](./README-zh_CN.md)
 
-for docs, please visit [tuya docs](https://docs.tuya.com)
+This document provides development templates of common categories.
 
-for users outside Chinese mainland, please remove `.npmrc` file.
+You can read the [official documents](https://developer.tuya.com/en/docs/iot) for more information.
 
-## Download manually
+## Prerequisites
 
-```bash
-$ curl https://codeload.github.com/tuya/tuya-panel-demo/tar.gz/master | tar -xz --strip=2 tuya-panel-demo-master/examples/basic-ts-0.59
-$ mv basic tuya-panel-basic-ts-0.59-example
-$ cd tuya-panel-basic-ts-0.59-example
-```
-
-## Introduction
-
-The template project is the basic typescript template of react native version 0.59, which can start all Tuya products and be used to debug the DP points of the current product, in addition, it supports the following functions:
-
-1. Path Alias;
-2. React、Redux Hooks;
-
-You can scan the following QR code through the Tuya app to preview.
-
-![Basic-0.59](https://images.tuyacn.com/rms-static/91fab3d0-392d-11eb-8584-77b31b3e78b8-1607415345037.png?tyName=basic-0.59.png)
+- nodejs 8+
+- `npm` or `yarn`
 
 ## Running
 
+To quickly run a panel project, run:
+
 ```bash
+$ cd examples/${TemplateName}
 $ npm install && npm run start
 # or
-$ yarn && yarn start
+$ yarn && yarn start # if you use yarn
+```
+
+Then, open your Tuya Smart app for debugging.
+
+## Examples
+
+> It is recommended to use the template of `tuya-panel-ki` **4.0.0** or above for development, and the 2.0.0 series is no longer maintained
+
+- [airPurifier](./examples/airPurifier)
+- [airThermostat](./examples/airThermostat)
+- [basic-ts-0.59](./examples/basic-ts-0.59)
+- [basic-ts-navigation](./examples/basic-ts-navigation)
+- [basic](./examples/basic)
+- [cooker](./examples/cooker)
+- [curtain](./examples/curtain)
+- [curtainSwitch](./examples/curtainSwitch)
+- [electricHeatingTable](./examples/electricHeatingTable)
+- [gatewayBleMesh](./examples/gatewayBleMesh)
+- [gatewayZigbee](./examples/gatewayZigbee)
+- [ipc](./examples/ipc)
+- [ipcBasic](./examples/ipcBasic)
+- [lampClassic](./examples/lampClassic)
+- [lampDimmer](./examples/lampDimmer)
+- [lampGeneric](./examples/lampGeneric)
+- [platoonSocket](./examples/platoonSocket)
+- [scenario](./examples/scenario)
+- [sensor](./examples/sensor)
+- [smartLock](./examples/smartLock)
+- [smartLockZigbee](./examples/smartLockZigbee)
+- [switch](./examples/switch)
+- [wirelessSwitch](./examples/wirelessSwitch)
+
+You can check the complete list of Tuya Panel examples [here](./examples).
+
+## Batch upgrade tuya-panel-kit
+
+```sh
+# 4.x & 2.x
+$ sudo ./scripts/tuya-panel-kit 4.x 2.x
+# 4.x
+$ sudo ./scripts/tuya-panel-kit 4.x
+# 2.x
+$ sudo ./scripts/tuya-panel-kit "" 2.x
 ```
 
 ## License

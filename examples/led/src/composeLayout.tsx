@@ -79,10 +79,11 @@ const composeLayout = (store: Store, component: React.ComponentType) => {
 
       // FIXME: 注入初始状态
       async function initLocal() {
-        const current = await AsyncStorage.getItem('current');
-        // alert('ccur=' + current);
+        const current = 'RB';
+        // const current = await AsyncStorage.getItem('current');
+        // // alert('ccur=' + current);
         setTimeout(() => {
-          dispatch(actions.product.changeCurrent(current || ''));
+          dispatch(actions.product.changeCurrent(current));
         }, 500);
 
         const gradientTime = await AsyncStorage.getItem(`${current}_gradientTime`);
@@ -158,7 +159,7 @@ const composeLayout = (store: Store, component: React.ComponentType) => {
                             // text: '灯光',
                             onPress: () =>
                               TYSdk.Navigator.push({
-                                id: 'light-setting',
+                                id: 'main',
                                 title: 'light setting',
                               }),
                           },

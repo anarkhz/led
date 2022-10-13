@@ -69,6 +69,16 @@ const recommend = {
   ],
 };
 
+const productSchema = {
+  RB: [
+    'red_bright_value',
+    'blue_bright_value',
+    'purple_bright_value',
+    'uvc_bright_value',
+    'bright_value',
+  ],
+};
+
 const custom = {
   RB: [
     {
@@ -102,6 +112,7 @@ export function useSettingConfig(current) {
     recommend: recommend[current] || [],
     custom: custom[current] || [],
     defaultSetting: defaultSetting[current] || {},
+    productSchema: productSchema[current] || [],
   });
 }
 

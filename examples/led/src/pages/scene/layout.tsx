@@ -101,20 +101,6 @@ const Layout: React.FC = props => {
     );
   };
 
-  const renderSettingModal = () => {
-    if (product.current) {
-      return (
-        <LightSettingModal
-          ref={cRef}
-          // onCancel={() => setModalVisible(false)}
-          onConfirm={setting => handleModalConfirm(setting)}
-        />
-      );
-    } else {
-      return null;
-    }
-  };
-
   const SceneItems: React.FC = () => {
     const getSceneList = () => {
       const current = product.current;
@@ -155,10 +141,10 @@ const Layout: React.FC = props => {
         onMaskPress: ({ close }) => close(),
         onSelect: (value, { close: popupClose }) => {
           if (value === 'use') {
-            dispatch(actions.product.changeLightSetting(item.setting));
+            TYSdk.device.putDeviceData(item.setting);
             popupClose();
             TYSdk.Navigator.push({
-              id: 'light-setting',
+              id: 'main',
             });
           } else if (value === 'edit') {
             popupClose();
@@ -217,7 +203,11 @@ const Layout: React.FC = props => {
         <SceneItems />
       </ScrollView>
       <AddSceneButton />
-      {renderSettingModal()}
+      <LightSettingModal
+        ref={cRef}
+        // onCancel={() => setModalVisible(false)}
+        onConfirm={setting => handleModalConfirm(setting)}
+      />
     </View>
   );
 };
