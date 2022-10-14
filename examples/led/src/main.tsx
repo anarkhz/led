@@ -27,7 +27,6 @@ type Props = ReduxState & { dispatch: Dispatch };
 //   console.log('TYSdk :', TYSdk);
 // }
 
-AsyncStorage.setItem('current', 'RB');
 const routers = [
   {
     id: 'main',
@@ -37,32 +36,27 @@ const routers = [
   },
   {
     id: 'switch-product',
-    title: 'Switch Product',
+    title: '选择产品',
     component: props => <SwitchProduct {...props} />,
   },
   {
     id: 'switch-gradient',
-    title: 'Switch Gradient',
+    title: '灯光渐变',
     component: props => <SwitchGradient {...props} />,
   },
-  // {
-  //   id: 'light-setting',
-  //   title: 'Setting',
-  //   component: props => <LightSetting {...props} />,
-  // },
   {
     id: 'scene',
-    title: 'Scene',
+    title: '我的场景',
     component: props => <Scene {...props} />,
   },
   {
     id: 'timer',
-    title: 'Timer',
+    title: '定时设置',
     component: props => <Timer {...props} />,
   },
   {
     id: 'timer-add',
-    title: 'TTT',
+    title: '添加定时',
     component: props => <TimerAdd {...props} />,
   },
   // {

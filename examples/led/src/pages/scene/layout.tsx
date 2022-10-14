@@ -15,6 +15,8 @@ import React, { useRef } from 'react';
 import { useDispatch } from 'react-redux';
 import { useSelector, actions } from '@models';
 
+import { icon } from '@config';
+
 import LightSettingModal from '@components/lightSettingModal';
 
 const {
@@ -25,30 +27,88 @@ const {
   viewHeight,
 } = Utils.RatioUtils;
 
-const addIconPath =
-  'M558.545455 240.48484804v217.212122h217.212121v93.090909H558.529939L558.545455 768.00000004h-93.09091l-0.015515-217.212121H248.242424v-93.090909h217.212121V240.48484804z';
-
 const Layout: React.FC = props => {
+  const dpState = useSelector(state => state.dpState);
+  const devInfo = useSelector(state => state.devInfo);
   const product = useSelector(state => state.product);
+  const { scene, current } = product;
   const dispatch = useDispatch();
-
   const cRef = useRef(null);
-
   const [editIndex, setEditIndex] = React.useState(0);
 
-  function handleAddScene() {
-    cRef.current.open({
-      type: 'add-scene',
+  /**
+   * Handlers
+   */
+  const handleScenePress = (item, index) => {
+    Popup.list({
+      type: 'radio',
+      // maxItemNum: 7,
+      dataSource: [
+        {
+          key: '0',
+          title: '应用场景',
+          value: 'use',
+        },
+        {
+          key: '1',
+          title: '编辑场景',
+          value: 'edit',
+        },
+        {
+          key: '2',
+          title: '删除场景',
+          value: 'delete',
+        },
+      ],
+      title: '请选择',
+      cancelText: '取消',
+      // value: '',
+      selectedIcon: <View></View>,
+      footerType: 'singleCancel',
+      onMaskPress: ({ close }) => close(),
+      onSelect: (value, { close: popupClose }) => {
+        if (value === 'use') {
+          TYSdk.device.putDeviceData(item.setting);
+          popupClose();
+          TYSdk.Navigator.push({
+            id: 'main',
+          });
+        } else if (value === 'edit') {
+          popupClose();
+          setTimeout(() => {
+            handleEditScene(item, index);
+          }, 500);
+        } else if (value === 'delete') {
+          Dialog.confirm({
+            title: '确定要删除吗',
+            cancelText: '取消',
+            confirmText: '确认',
+            onConfirm: (data, { close: confirmClose }) => {
+              dispatch(actions.product.deleteScene({ index }));
+              confirmClose();
+              popupClose();
+            },
+          });
+        }
+      },
     });
-  }
+  };
+
+  const handleAddScene = () => {
+    cRef.current &&
+      cRef.current.open({
+        type: 'add-scene',
+      });
+  };
 
   function handleEditScene(item, index) {
     setEditIndex(index);
-    cRef.current.open({
-      type: 'edit-scene',
-      name: item.name,
-      setting: item.setting,
-    });
+    cRef.current &&
+      cRef.current.open({
+        type: 'edit-scene',
+        name: item.name,
+        setting: item.setting,
+      });
   }
 
   function handleModalConfirm({ type, name, setting }) {
@@ -70,17 +130,39 @@ const Layout: React.FC = props => {
     }
   }
 
-  const AddSceneButton: React.FC = () => {
+  /**
+   * Renders
+   */
+  const renderSceneItems = () => {
+    if (scene && scene[current] && scene[current].length > 0) {
+      return (
+        <View style={styles.sceneItems}>
+          {scene[current].map((item, index) => {
+            return (
+              <Button
+                textStyle={styles.sceneItemText}
+                style={styles.sceneItem}
+                text={item.name}
+                onPress={() => handleScenePress(item, index)}
+              ></Button>
+            );
+          })}
+          <Button style={styles.scenePlaceItems} />
+          <Button style={styles.scenePlaceItems} />
+        </View>
+      );
+    } else {
+      return null;
+    }
+  };
+
+  const renderAddButton = () => {
     return (
-      <Button
-        iconColor="#fff"
-        size={24}
+      <View
         style={{
           position: 'absolute',
           bottom: cx(32),
           left: deviceWidth - cx(60),
-          width: cx(48),
-          height: cx(48),
           borderRadius: cx(24),
           backgroundColor: '#1C1D1E',
           shadowColor: '#000',
@@ -92,121 +174,32 @@ const Layout: React.FC = props => {
           shadowRadius: 24,
           elevation: 8,
         }}
-        wrapperStyle={{
-          alignSelf: 'flex-start',
-        }}
-        iconPath={addIconPath}
-        onPress={handleAddScene}
-      />
-    );
-  };
-
-  const SceneItems: React.FC = () => {
-    const getSceneList = () => {
-      const current = product.current;
-      if (current) {
-        return product[`${current}_scene`];
-      } else {
-        return [];
-      }
-    };
-
-    const handleScenePress = (item, index) => {
-      Popup.list({
-        type: 'radio',
-        // maxItemNum: 7,
-        dataSource: [
-          {
-            key: '0',
-            title: '应用场景',
-            value: 'use',
-          },
-          {
-            key: '1',
-            title: '编辑场景',
-            value: 'edit',
-          },
-          {
-            key: '2',
-            title: '删除场景',
-            value: 'delete',
-          },
-        ],
-        title: '请选择',
-        // subTitle: '副标题',
-        cancelText: '取消',
-        // value: '',
-        selectedIcon: <View></View>,
-        footerType: 'singleCancel',
-        onMaskPress: ({ close }) => close(),
-        onSelect: (value, { close: popupClose }) => {
-          if (value === 'use') {
-            TYSdk.device.putDeviceData(item.setting);
-            popupClose();
-            TYSdk.Navigator.push({
-              id: 'main',
-            });
-          } else if (value === 'edit') {
-            popupClose();
-            setTimeout(() => {
-              handleEditScene(item, index);
-            }, 500);
-            // dispatch(actions.product.changeFooterVisible(false));
-            // TYSdk.Navigator.push({
-            //   id: 'scene-edit',
-            //   index,
-            // });
-          } else if (value === 'delete') {
-            // close();
-            // setTimeout(() => {
-            Dialog.confirm({
-              title: '确定要删除吗',
-              // subTitle: '副标题',
-              cancelText: '取消',
-              confirmText: '确认',
-              onConfirm: (data, { close: confirmClose }) => {
-                dispatch(actions.product.deleteScene({ index }));
-                confirmClose();
-                popupClose();
-              },
-            });
-            // }, 500);
-          }
-          // setState({ listValue: value });
-          // close();
-        },
-      });
-    };
-
-    const renderSceneItems = items =>
-      items.map((item, index) => (
+      >
         <Button
-          textStyle={styles.sceneItemText}
-          style={styles.sceneItem}
-          text={item.name}
-          onPress={() => handleScenePress(item, index)}
-        ></Button>
-      ));
-
-    return (
-      <View style={styles.sceneItems}>
-        {renderSceneItems(getSceneList())}
-        <Button style={styles.scenePlaceItems} />
-        <Button style={styles.scenePlaceItems} />
+          iconColor="#fff"
+          size={24}
+          style={{
+            width: cx(48),
+            height: cx(48),
+          }}
+          wrapperStyle={{
+            alignSelf: 'flex-start',
+          }}
+          iconPath={icon.path.plus}
+          onPress={handleAddScene}
+        />
       </View>
     );
   };
 
   return (
     <View style={{ flex: 1 }}>
-      <ScrollView>
-        <SceneItems />
-      </ScrollView>
-      <AddSceneButton />
+      <ScrollView>{renderSceneItems()}</ScrollView>
+      {renderAddButton()}
       <LightSettingModal
         ref={cRef}
         // onCancel={() => setModalVisible(false)}
-        onConfirm={setting => handleModalConfirm(setting)}
+        onConfirm={options => handleModalConfirm(options)}
       />
     </View>
   );

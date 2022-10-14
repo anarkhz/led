@@ -20,7 +20,7 @@ interface ProductState {
 
 const productState: ProductState = {
   showFooter: true,
-  current: 'RB',
+  current: '',
   // gradientTime: {},
   scene: [] as any,
   timer: [] as any,
@@ -37,6 +37,7 @@ const deleteScene = createAction('DELETE_SCENE');
 const initTimer = createAction('INIT_TIMER');
 const addTimer = createAction('ADD_TIMER');
 const changeTimer = createAction('CHANGE_TIMER');
+const deleteTimer = createAction('DELETE_TIMER');
 
 export const actions = {
   changeFooterVisible,
@@ -50,6 +51,7 @@ export const actions = {
   initTimer,
   addTimer,
   changeTimer,
+  deleteTimer,
 };
 
 export const product = handleActions<any>(
@@ -57,12 +59,14 @@ export const product = handleActions<any>(
     CHANGE_FOOTER_VISIBLE: (state, action) => {
       return {
         ...state,
-        showFooter: action.payload.visible,
+        showFooter: action.payload,
       };
     },
     CHANGE_CURRENT: (state, action) => {
       const current = action.payload;
+
       AsyncStorage.setItem('current', current);
+
       return {
         ...state,
         current,
@@ -111,35 +115,44 @@ export const product = handleActions<any>(
     // },
     INIT_SCENE: (state, action) => {
       const { scene } = action.payload;
-      const current = state.current;
+      // const current = state.current;
       return {
         ...state,
-        [`${current}_scene`]: scene || [],
+        ...{
+          scene,
+        },
       };
     },
     ADD_SCENE: (state, action) => {
       const { name, setting } = action.payload;
       const current = state.current;
-      const sceneList = state[`${current}_scene`] || [];
+      const productScene = state.scene[current] || [];
 
-      const newSceneList = sceneList.concat({
+      const newProductScene = productScene.concat({
         name,
         setting,
       });
 
-      AsyncStorage.setItem(`${current}_scene`, JSON.stringify(newSceneList));
+      const newSceneList = {
+        ...state.scene,
+        [current]: newProductScene || [],
+      };
+
+      AsyncStorage.setItem('scene', JSON.stringify(newSceneList));
 
       return {
         ...state,
-        [`${current}_scene`]: newSceneList,
+        ...{
+          scene: newSceneList,
+        },
       };
     },
     CHANGE_SCENE: (state, action) => {
       const { index, name, setting } = action.payload;
       const current = state.current;
-      const sceneList = state[`${current}_scene`] || [];
+      const productScene = state.scene[current] || [];
 
-      const newSceneList = sceneList.map((sItem, sIndex) => {
+      const newProductScene = productScene.map((sItem, sIndex) => {
         if (sIndex === index) {
           sItem.name = name;
           sItem.setting = setting;
@@ -147,62 +160,78 @@ export const product = handleActions<any>(
         return sItem;
       });
 
-      AsyncStorage.setItem(`${current}_scene`, JSON.stringify(newSceneList));
+      const newSceneList = {
+        ...state.scene,
+        [current]: newProductScene || [],
+      };
+
+      AsyncStorage.setItem(`scene`, JSON.stringify(newSceneList));
 
       return {
         ...state,
         ...{
-          [`${current}_scene`]: newSceneList,
+          scene: newSceneList,
         },
       };
     },
     DELETE_SCENE: (state, action) => {
       const { index } = action.payload;
       const current = state.current;
-      const sceneList = state[`${current}_scene`] || [];
+      const productScene = state.scene[current] || [];
 
-      sceneList.splice(index, 1);
+      productScene.splice(index, 1);
 
-      const newSceneList = [...sceneList];
+      const newProductScene = [...productScene];
 
-      AsyncStorage.setItem(`${current}_scene`, JSON.stringify(newSceneList));
+      const newSceneList = {
+        ...state.scene,
+        [current]: newProductScene || [],
+      };
+
+      AsyncStorage.setItem(`scene`, JSON.stringify(newSceneList));
 
       return {
         ...state,
         ...{
-          [`${current}_scene`]: newSceneList,
+          scene: newSceneList,
         },
       };
     },
     INIT_TIMER: (state, action) => {
       const { timer } = action.payload;
-      const current = state.current;
 
       return {
         ...state,
-        [`${current}_timer`]: timer || [],
+        timer: timer || [],
       };
     },
     ADD_TIMER: (state, action) => {
       const { timer } = action.payload;
       const current = state.current;
-      const timerList = state[`${current}_timer`] || [];
+      const productTimer = state.timer[current] || [];
 
-      const newTimerList = timerList.concat(timer);
+      const newProductTimer = productTimer.concat(timer);
 
-      AsyncStorage.setItem(`${current}_timer`, JSON.stringify(newTimerList));
+      const newTimerList = {
+        ...state.timer,
+        [current]: newProductTimer || [],
+      };
+
+      AsyncStorage.setItem(`timer`, JSON.stringify(newTimerList));
 
       return {
         ...state,
-        [`${current}_timer`]: newTimerList,
+        ...{
+          timer: newTimerList,
+        },
       };
     },
     CHANGE_TIMER: (state, action) => {
       const { index, timer } = action.payload;
       const current = state.current;
-      const timerList = state[`${current}_timer`] || [];
+      const productTimer = state.timer[current] || [];
 
-      const newTimerList = timerList.map((item, sIndex) => {
+      const newProductTimer = productTimer.map((item, sIndex) => {
         if (sIndex === index) {
           item = {
             ...timer,
@@ -211,10 +240,40 @@ export const product = handleActions<any>(
         return item;
       });
 
+      const newTimerList = {
+        ...state.timer,
+        [current]: newProductTimer || [],
+      };
+
+      AsyncStorage.setItem(`timer`, JSON.stringify(newTimerList));
+
       return {
         ...state,
         ...{
-          [`${current}_timer`]: newTimerList,
+          timer: newTimerList,
+        },
+      };
+    },
+    DELETE_TIMER: (state, action) => {
+      const { index } = action.payload;
+      const current = state.current;
+      const productTimer = state.timer[current] || [];
+
+      productTimer.splice(index, 1);
+
+      const newProductTimer = [...productTimer];
+
+      const newTimerList = {
+        ...state.timer,
+        [current]: newProductTimer || [],
+      };
+
+      AsyncStorage.setItem(`timer`, JSON.stringify(newTimerList));
+
+      return {
+        ...state,
+        ...{
+          timer: newTimerList,
         },
       };
     },

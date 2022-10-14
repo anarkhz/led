@@ -1,59 +1,50 @@
 import React from 'react';
 import { View, SafeAreaView, ScrollView, Text, StyleSheet, AsyncStorage } from 'react-native';
-import { Utils, Button, TYText } from 'tuya-panel-kit';
+import { TYSdk, Utils, Button, TYText } from 'tuya-panel-kit';
 
 import { useDispatch } from 'react-redux';
 import { useSelector, actions } from '@models';
+import { color, productConfig } from '@config';
 
 const { convertX: cx, width: deviceWidth, height: deviceHeight } = Utils.RatioUtils;
 
-const productItems = [
-  {
-    label: '2-R-B',
-    value: 'RB',
-  },
-  {
-    label: '5-R-B-W-FR-UV',
-    value: 'RBWFrUv',
-  },
-  {
-    label: '3-R-B-FR',
-    value: 'RBFr',
-  },
-  {
-    label: '2-R-W',
-    value: 'RW',
-  },
-];
-
 const SwitchProduct: React.FC = () => {
-  const productState = useSelector(state => state.product);
+  const product = useSelector(state => state.product);
   const dispatch = useDispatch();
 
-  const renderProductItems = productState =>
-    productItems.map(item => {
+  if (product.showFooter) {
+    dispatch(actions.product.changeFooterVisible(false));
+  }
+
+  const handleButtonPress = item => {
+    dispatch(actions.product.changeCurrent(item.value));
+    setTimeout(() => {
+      TYSdk.Navigator.pop();
+    }, 0);
+  };
+
+  const renderProductItems = () =>
+    productConfig.listSchema.map(item => {
       return (
         <Button
           size={24}
           style={[
             styles.productButton,
-            productState.current === item.value ? styles.productButtonActive : null,
-            // { backgroundColor: productState.current === item.value ? '#00FFFF' : '#000000' },
+            product.current === item.value ? styles.productButtonActive : null,
           ]}
           textStyle={styles.textStyle}
-          text={item.label}
-          onPress={() => dispatch(actions.product.changeCurrent(item.value))}
+          text={item.title}
+          onPress={() => handleButtonPress(item)}
         />
       );
     });
 
-  return <View style={styles.container}>{renderProductItems(productState)}</View>;
+  return <View style={styles.container}>{renderProductItems()}</View>;
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'center',
@@ -71,10 +62,10 @@ const styles = StyleSheet.create({
     width: cx(160),
     height: cx(160),
     margin: cx(8),
-    backgroundColor: '#000',
+    backgroundColor: color.dark,
   },
   productButtonActive: {
-    borderColor: 'red',
+    borderColor: color.young,
     borderWidth: cx(4),
     borderRadius: 8,
   },

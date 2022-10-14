@@ -21,6 +21,8 @@ import { minToTimeStr, getLoopDaysLabel } from '@utils';
 import { useDispatch } from 'react-redux';
 import { useSelector, actions } from '@models';
 
+import { color } from '@config';
+
 import LightSettingModal from '@components/lightSettingModal';
 
 const {
@@ -46,8 +48,8 @@ const Layout: React.FC = () => {
 
   const defaultLoopDays: number[] = [];
   const [loopDays, setLoopDays] = React.useState(defaultLoopDays);
-
   const [timerSetting, setTimerSetting] = React.useState(null);
+  const [recommendSource, setRecommendSource] = React.useState(null);
 
   const data = [
     {
@@ -190,8 +192,14 @@ const Layout: React.FC = () => {
     },
   ];
 
-  const handleModalConfirm = setting => {
+  /**
+   * Handlers
+   */
+  const handleModalConfirm = ({ setting, img }) => {
     setTimerSetting(setting);
+    if (img) {
+      setRecommendSource(img);
+    }
   };
 
   const handleTimerAdd = () => {
@@ -215,6 +223,7 @@ const Layout: React.FC = () => {
           running: false,
           loopDays: loopDays,
           setting: timerSetting,
+          img: recommendSource,
         },
       })
     );
@@ -223,31 +232,22 @@ const Layout: React.FC = () => {
     }, 100);
   };
 
-  const renderSettingModal = () => {
-    if (product.current) {
-      return (
-        <LightSettingModal
-          ref={cRef}
-          // visible={modalVisible}
-          // onCancel={() => setModalVisible(false)}
-          onConfirm={setting => handleModalConfirm(setting)}
-        />
-      );
-    } else {
-      return null;
-    }
-  };
-
   return (
     <View style={{ flex: 1 }}>
-      <TYText style={styles.title} text="定时设置"></TYText>
+      {/* <TYText style={styles.title} text="定时设置"></TYText> */}
+      <Divider />
       <TYListItem {...data[0]} />
       <Divider />
       <TYListItem {...data[1]} />
       <Divider />
       <TYListItem {...data[2]} />
-      <BrickButton style={styles.confirmButton} text="保存" onPress={() => handleTimerAdd()} />
-      {renderSettingModal()}
+      <BrickButton
+        style={styles.confirmButton}
+        text="保存"
+        onPress={() => handleTimerAdd()}
+        theme={{ bgColor: color.young }}
+      />
+      <LightSettingModal ref={cRef} onConfirm={options => handleModalConfirm(options)} />
     </View>
   );
 };

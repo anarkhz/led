@@ -47,3 +47,38 @@ export function getLoopDaysLabel(loopDays) {
       .join(', ');
   }
 }
+
+export function binStrToHex(str, digit, padNum = '0') {
+  const decimal = parseInt(str, 2);
+  return digit ? decimal.toString(16).padStart(digit, padNum) : decimal.toString(16);
+}
+
+/**
+ * ABCDEFG 7字节； A：设备动作；BCDEFG：动作参数；
+ * A=0x00，关灯，BCDEFG无效；
+ * A=0x01，开灯，BCDEFG无效；
+ * A=0x02，白光，
+ *  B：亮度，1-100，
+ *  C：色温，0-100，DEFG无效；
+ * A=0x03，彩光，
+ *  BC：色度，0-360，
+ *  D：饱和度，0-100，
+ *  E：彩光亮度，0-100，FG无效；
+ * A=0x04，混光，RGBCW全亮，
+ *  BC：色度，0-360，
+ *  D：饱和度，0-100，
+ *  E：彩光亮度，1-100，
+ *  F：白光亮度，1-100，
+ *  G：色温，0-100；
+ * A=0x05，情景，
+ *  B：场景ID，0-15，CDEFG无效；
+ * A=0x06，节能，B：场景ID，0-15，
+ *  C：节能开关，0-关，1-开，DEFG无效；
+ * A=0x07，太阳能，
+ *  BC：色度，0-360，
+ *  D：饱和度，0-100，
+ *  E：彩光亮度，1-100，
+ *  F：白光亮度，1-100，
+ *  G：色温，0-100；
+ * A=0x08，执行定时前状态，BCDEFG无效；
+ */

@@ -66,6 +66,14 @@ const Layout = forwardRef((props, ref) => {
     setRecommendSource(item.img);
   };
 
+  const handleControlValueChange = _.debounce((key, value) => {
+    setSetting({
+      ...setting,
+      [key]: Math.round(value) * 10,
+    });
+    setRecommendSource(Res.cat);
+  }, 200);
+
   const onCancel = function () {
     props.onCancel && props.onCancel();
     setVisible(false);
@@ -80,7 +88,7 @@ const Layout = forwardRef((props, ref) => {
         });
       }
     }
-    props.onConfirm && props.onConfirm({ type, setting, name });
+    props.onConfirm && props.onConfirm({ type, setting, name, img: recommendSource });
     setVisible(false);
   };
 
@@ -90,13 +98,16 @@ const Layout = forwardRef((props, ref) => {
   const renderNameInput = () => {
     if (type === 'add-scene' || type === 'edit-scene') {
       return (
-        <TextInput
-          style={styles.name}
-          maxLength={12}
-          placeholder="请输入场景名称"
-          value={name}
-          onChangeText={v => setName(v)}
-        />
+        <View style={[commonStyles.card, commonStyles.line]}>
+          <TYText text="场景名称" size={18} />
+          <TextInput
+            style={styles.name}
+            maxLength={12}
+            placeholder="请输入场景名称"
+            value={name}
+            onChangeText={v => setName(v)}
+          />
+        </View>
       );
     } else {
       return null;
@@ -208,6 +219,13 @@ const Layout = forwardRef((props, ref) => {
             width: deviceWidth,
             height: cx(56),
             backgroundColor: '#FFF',
+            shadowColor: '#000',
+            shadowOffset: {
+              width: 0,
+              height: -1,
+            },
+            shadowOpacity: 0.2,
+            shadowRadius: 8,
           }}
         >
           <Button
@@ -255,15 +273,15 @@ const styles = StyleSheet.create({
    * Name
    */
   name: {
-    marginTop: cx(12),
+    // marginTop: cx(12),
     width: cx(240),
     fontSize: cx(18),
     borderWidth: cx(1),
     borderColor: '#CCCCCC',
     paddingVertical: cx(4),
     paddingHorizontal: cx(6),
-    textAlign: 'center',
-    alignSelf: 'center',
+    // textAlign: 'center',
+    // alignSelf: 'center',
   },
   /**
    * Recommend
@@ -300,6 +318,7 @@ const styles = StyleSheet.create({
   banner: {
     alignSelf: 'center',
     width: deviceWidth - cx(32),
+    height: cx(160),
     marginVertical: cx(16),
   },
   /**

@@ -84,45 +84,49 @@ const composeLayout = (store: Store, component: React.ComponentType) => {
         TYDevice.getDeviceInfo().then(data => dispatch(actions.common.devInfoChange(data)));
       }
 
-      setTimeout(() => {
-        this.setState({ storagePrepared: true });
-      }, 0);
+      // setTimeout(() => {
+      //   this.setState({ storagePrepared: true });
+      // }, 0);
 
       // FIXME: 注入初始状态
-      async function initLocal() {
-        // const current = 'RB';
-        // const current = await AsyncStorage.getItem('current');
-        // // alert('ccur=' + current);
-        // setTimeout(() => {
-        //   dispatch(actions.product.changeCurrent(current));
-        // }, 500);
-        // const gradientTime = await AsyncStorage.getItem(`${current}_gradientTime`);
-        // const lightSetting = await AsyncStorage.getItem(`${current}_lightSetting`);
-        // // const switchValue = await AsyncStorage.getItem(`${current}_switch`);
-        // const scene = await AsyncStorage.getItem(`${current}_scene`);
-        // const timer = await AsyncStorage.getItem(`${current}_timer`);
-        // setTimeout(() => {
-        //   dispatch(actions.product.changeGradientTime(Number(gradientTime)));
-        //   if (lightSetting) {
-        //     dispatch(actions.product.changeLightSetting(JSON.parse(lightSetting)));
-        //   }
-        //   // dispatch(actions.product.changeSwitch(switchValue === 'on' ? true : false));
-        //   if (scene) {
-        //     dispatch(
-        //       actions.product.initScene({
-        //         scene: JSON.parse(scene),
-        //       })
-        //     );
-        //   }
-        //   if (timer) {
-        //     dispatch(
-        //       actions.product.initTimer({
-        //         timer: JSON.parse(timer),
-        //       })
-        //     );
-        //   }
-        // }, 500);
-      }
+      const initLocal = async () => {
+        const getCurrentPromise = AsyncStorage.getItem('current');
+        const getScenePromise = AsyncStorage.getItem('scene');
+        const getTimerPromise = AsyncStorage.getItem('timer');
+        Promise.all([getCurrentPromise, getScenePromise, getTimerPromise])
+          .then(result => {
+            const [current, scene, timer] = result;
+            if (current) {
+              dispatch(actions.product.changeCurrent(current));
+            } else {
+              dispatch(actions.product.changeCurrent('RB'));
+              setTimeout(() => {
+                TYSdk.Navigator.push({
+                  id: 'switch-product',
+                });
+              }, 0);
+            }
+
+            if (scene) {
+              dispatch(
+                actions.product.initScene({
+                  scene: JSON.parse(scene),
+                })
+              );
+            }
+            if (timer) {
+              dispatch(
+                actions.product.initTimer({
+                  timer: JSON.parse(timer),
+                })
+              );
+            }
+            this.setState({ storagePrepared: true });
+          })
+          .catch(() => {
+            this.setState({ storagePrepared: true });
+          });
+      };
 
       initLocal();
     }

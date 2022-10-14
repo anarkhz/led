@@ -4,7 +4,17 @@ import React from 'react';
 
 import Layout from './layout';
 
+import { useDispatch } from 'react-redux';
+import { useSelector, actions } from '@models';
+
 const Component: React.FC = () => {
+  const product = useSelector(state => state.product);
+  const dispatch = useDispatch();
+
+  if (!product.showFooter) {
+    dispatch(actions.product.changeFooterVisible(true));
+  }
+
   return (
     <View style={styles.container}>
       <Layout></Layout>
