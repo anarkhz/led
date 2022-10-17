@@ -21,7 +21,7 @@ import { useSelector, actions } from '@models';
 
 import { color, productConfig } from '@config';
 import Res from '@res';
-
+import Strings from '@i18n';
 const { convertX: cx, width: deviceWidth, height: deviceHeight } = Utils.RatioUtils;
 
 const Layout: React.FC = () => {
@@ -30,7 +30,6 @@ const Layout: React.FC = () => {
   const current = useSelector(state => state.product.current);
   const dispatch = useDispatch();
   const [recommendSource, setRecommendSource] = React.useState(Res.cat);
-
   /**
    * Getters
    */
@@ -65,21 +64,21 @@ const Layout: React.FC = () => {
       dataSource: [
         {
           key: '0',
-          title: '切换产品',
+          title: Strings.getLang('change_product'),
           value: 'switch-product',
         },
       ],
-      title: '请选择',
-      cancelText: '取消',
+      title: Strings.getLang('choose'),
+      cancelText: Strings.getLang('cancel'),
       selectedIcon: <View></View>,
       footerType: 'singleCancel',
       onMaskPress: ({ close }) => close(),
       onSelect: (value, { close: popupClose }) => {
         if (value === 'switch-product') {
           Dialog.checkbox({
-            title: '请选择',
-            cancelText: '取消',
-            confirmText: '确认',
+            title: Strings.getLang('choose'),
+            cancelText: Strings.getLang('cancel'),
+            confirmText:Strings.getLang('confirm'),
             type: 'radio',
             maxItemNum: 7,
             value: current,
@@ -110,7 +109,7 @@ const Layout: React.FC = () => {
                 marginBottom: cx(8),
                 color: color.text,
               }}
-              text="光质推荐"
+              text={Strings.getLang('recommend_light')}
             />
             <View style={styles.buttonList}>
               {productConfig.recommend[current].map(item => (
@@ -136,7 +135,7 @@ const Layout: React.FC = () => {
   const renderControl = () => {
     return (
       <View style={commonStyles.card}>
-        <TYText text="自定义" size={18} />
+        <TYText text={Strings.getLang('custom_bright')} size={18} />
         {productConfig.controlSchema[current].map(key => (
           <View
             style={{

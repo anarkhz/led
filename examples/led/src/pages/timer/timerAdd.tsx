@@ -22,7 +22,7 @@ import { useDispatch } from 'react-redux';
 import { useSelector, actions } from '@models';
 
 import { color } from '@config';
-
+import Strings from '@i18n';
 import LightSettingModal from '@components/lightSettingModal';
 
 const {
@@ -54,7 +54,7 @@ const Layout: React.FC = () => {
   const data = [
     {
       key: 0,
-      title: '时间',
+      title: Strings.getLang("time"),
       arrow: true,
       onPress: () => {
         Popup.custom({
@@ -75,9 +75,9 @@ const Layout: React.FC = () => {
               />
             </View>
           ),
-          title: '请选择',
-          cancelText: '取消',
-          confirmText: '确认',
+          title: Strings.getLang('choose'),
+          cancelText: Strings.getLang('cancel'),
+          confirmText: Strings.getLang('confirm'),
           onMaskPress: ({ close }) => close(),
           onConfirm: (data, { close }) => {
             close();
@@ -88,14 +88,14 @@ const Layout: React.FC = () => {
     },
     {
       key: 1,
-      title: '灯光设置',
+      title: Strings.getLang('light_setting'),
       arrow: true,
       onPress: () => {
         cRef.current.open({
           type: 'add-timer',
         });
       },
-      Action: timerSetting ? '已设置' : '未设置',
+      Action: timerSetting ? Strings.getLang('has_setting') : Strings.getLang('no_setting'),
     },
     {
       key: 2,
@@ -108,22 +108,22 @@ const Layout: React.FC = () => {
           dataSource: [
             {
               key: '0',
-              title: '一次',
+              title: Strings.getLang('loop_once'),
               value: 'once',
             },
             {
               key: '1',
-              title: '每天',
+              title: Strings.getLang('loop_every'),
               value: 'everyday',
             },
             {
               key: '2',
-              title: '自定义',
+              title: Strings.getLang('custom_bright'),
               value: 'custom',
             },
           ],
-          title: '请选择',
-          cancelText: '取消',
+          title: Strings.getLang('choose'),
+          cancelText: Strings.getLang('cancel'),
           selectedIcon: <View></View>,
           footerType: 'singleCancel',
           onMaskPress: ({ close }) => close(),
@@ -136,46 +136,46 @@ const Layout: React.FC = () => {
               popupClose();
             } else if (value === 'custom') {
               Dialog.checkbox({
-                title: '请选择',
-                cancelText: '取消',
-                confirmText: '确认',
+                title: Strings.getLang('choose'),
+                cancelText: Strings.getLang('cancel'),
+                confirmText: Strings.getLang('confirm'),
                 type: 'switch',
                 maxItemNum: 7,
                 value: loopDays,
                 dataSource: [
                   {
                     value: 1,
-                    title: '周一',
+                    title: Strings.getLang('mon'),
                     reverse: true,
                   },
                   {
                     value: 2,
-                    title: '周二',
+                    title: Strings.getLang('tue'),
                     reverse: true,
                   },
                   {
                     value: 3,
-                    title: '周三',
+                    title: Strings.getLang('wed'),
                     reverse: true,
                   },
                   {
                     value: 4,
-                    title: '周四',
+                    title: Strings.getLang('thu'),
                     reverse: true,
                   },
                   {
                     value: 5,
-                    title: '周五',
+                    title: Strings.getLang('fri'),
                     reverse: true,
                   },
                   {
                     value: 6,
-                    title: '周六',
+                    title: Strings.getLang('sat'),
                     reverse: true,
                   },
                   {
                     value: 7,
-                    title: '周日',
+                    title: Strings.getLang('sun'),
                     reverse: true,
                   },
                 ],

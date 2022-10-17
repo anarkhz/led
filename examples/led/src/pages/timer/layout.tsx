@@ -22,7 +22,7 @@ import { color, icon } from '@config';
 
 import { commonStyles } from 'style/common';
 import { minToTimeStr, getLoopDaysLabel, binStrToHex } from '@utils';
-
+import Strings from '@i18n';
 const { convertX: cx, width: deviceWidth, height: deviceHeight } = Utils.RatioUtils;
 
 const Layout: React.FC = () => {
@@ -88,12 +88,12 @@ const Layout: React.FC = () => {
         // },
         {
           key: '2',
-          title: '删除定时',
+          title:Strings.getLang('del_timer'),
           value: 'delete',
         },
       ],
-      title: '请选择',
-      cancelText: '取消',
+      title: Strings.getLang('choose'),
+      cancelText: Strings.getLang('cancel'),
       // value: '',
       selectedIcon: <View></View>,
       footerType: 'singleCancel',
@@ -101,9 +101,9 @@ const Layout: React.FC = () => {
       onSelect: (value, { close: popupClose }) => {
         if (value === 'delete') {
           Dialog.confirm({
-            title: '确定要删除吗',
-            cancelText: '取消',
-            confirmText: '确认',
+            title:Strings.getLang('del_timer_question'),
+            cancelText: Strings.getLang('cancel'),
+            confirmText: Strings.getLang('confirm'),
             onConfirm: (data, { close: confirmClose }) => {
               dispatch(actions.product.deleteTimer({ index }));
               confirmClose();

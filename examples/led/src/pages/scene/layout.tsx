@@ -18,7 +18,7 @@ import { useSelector, actions } from '@models';
 import { icon } from '@config';
 
 import LightSettingModal from '@components/lightSettingModal';
-
+import Strings from '@i18n';
 const {
   convertX: cx,
   width: deviceWidth,
@@ -46,22 +46,22 @@ const Layout: React.FC = props => {
       dataSource: [
         {
           key: '0',
-          title: '应用场景',
+          title: Strings.getLang('execute_scene'),
           value: 'use',
         },
         {
           key: '1',
-          title: '编辑场景',
+          title: Strings.getLang('edit_scene'),
           value: 'edit',
         },
         {
           key: '2',
-          title: '删除场景',
+          title: Strings.getLang('del_scene'),
           value: 'delete',
         },
       ],
-      title: '请选择',
-      cancelText: '取消',
+      title: Strings.getLang('choose'),
+      cancelText: Strings.getLang('cancel'),
       // value: '',
       selectedIcon: <View></View>,
       footerType: 'singleCancel',
@@ -80,9 +80,9 @@ const Layout: React.FC = props => {
           }, 500);
         } else if (value === 'delete') {
           Dialog.confirm({
-            title: '确定要删除吗',
-            cancelText: '取消',
-            confirmText: '确认',
+            title: Strings.getLang('del_scene_question'),
+            cancelText: Strings.getLang('cancel'),
+            confirmText: Strings.getLang('confirm'),
             onConfirm: (data, { close: confirmClose }) => {
               dispatch(actions.product.deleteScene({ index }));
               confirmClose();

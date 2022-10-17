@@ -9,7 +9,7 @@ import { commonStyles } from 'style/common';
 import { timeRecommend } from './service';
 
 const { convertX: cx } = Utils.RatioUtils;
-
+import Strings from '@i18n';
 const Layout: React.FC = () => {
   const [openTime, setOpenTime] = React.useState(0);
 
@@ -42,12 +42,12 @@ const Layout: React.FC = () => {
   const renderHeader = () => {
     return (
       <View style={commonStyles.line}>
-        <TYText text="开关渐变" size={18} />
+        <TYText text={Strings.getLang("switch_gradient")} size={18} />
         <TextInput
           style={styles.titleInput}
           keyboardType="numeric"
           maxLength={3}
-          placeholder="请输入渐变时间（分钟）"
+          placeholder={Strings.getLang("input_switch_gradient_hint")}
           value={openTime.toString()}
           onChangeText={handleInputChange}
         ></TextInput>
