@@ -201,7 +201,7 @@ const Layout: React.FC = () => {
         <Button
           style={[commonStyles.button, { width: cx(120) }]}
           textStyle={commonStyles.buttonText}
-          text="更多操作"
+          text={Strings.getLang('more')}
           onPress={handlePressMore}
         ></Button>
       </View>
