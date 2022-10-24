@@ -44,6 +44,7 @@ const productSchema = {
     'purple_bright_value',
     'uvc_bright_value',
     'bright_value',
+    'all_bright',
   ],
 };
 
