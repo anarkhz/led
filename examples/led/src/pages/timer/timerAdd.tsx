@@ -25,6 +25,8 @@ import { color } from '@config';
 import Strings from '@i18n';
 import LightSettingModal from '@components/lightSettingModal';
 
+import { getTimerId } from './helper';
+
 const {
   convertX: cx,
   width: deviceWidth,
@@ -49,12 +51,13 @@ const Layout: React.FC = () => {
   const defaultLoopDays: number[] = [];
   const [loopDays, setLoopDays] = React.useState(defaultLoopDays);
   const [timerSetting, setTimerSetting] = React.useState(null);
+  const [timerMultiwaySwitch, setTimerMultiwaySwitch] = React.useState(null);
   const [recommendSource, setRecommendSource] = React.useState(null);
 
   const data = [
     {
       key: 0,
-      title: Strings.getLang("time"),
+      title: Strings.getLang('time'),
       arrow: true,
       onPress: () => {
         Popup.custom({
@@ -195,17 +198,18 @@ const Layout: React.FC = () => {
   /**
    * Handlers
    */
-  const handleModalConfirm = ({ setting, img }) => {
+  const handleModalConfirm = ({ setting, img, multiwaySwitch }) => {
     setTimerSetting(setting);
+    setTimerMultiwaySwitch(multiwaySwitch);
     if (img) {
       setRecommendSource(img);
     }
   };
 
   const handleTimerAdd = () => {
-    if (time.startTime > time.endTime) {
+    if (time.endTime <= time.startTime) {
       return GlobalToast.show({
-        text: '开始时间不能大于结束时间',
+        text: '结束时间必须大于开始时间',
         showIcon: false,
       });
     }
@@ -215,14 +219,17 @@ const Layout: React.FC = () => {
         showIcon: false,
       });
     }
+
     dispatch(
       actions.product.addTimer({
         timer: {
+          id: getTimerId(product.timer, product.current),
           startTime: time.startTime,
           endTime: time.endTime,
           running: false,
           loopDays: loopDays,
           setting: timerSetting,
+          multiwaySwitch: timerMultiwaySwitch,
           img: recommendSource,
         },
       })

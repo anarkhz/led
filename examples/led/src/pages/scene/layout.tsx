@@ -10,15 +10,17 @@ import {
   Stepper,
   SwitchButton,
 } from 'tuya-panel-kit';
-import React, { useRef } from 'react';
+import React, { useRef, useEffect } from 'react';
 
 import { useDispatch } from 'react-redux';
 import { useSelector, actions } from '@models';
 
-import { icon } from '@config';
+import { color, icon } from '@config';
 
 import LightSettingModal from '@components/lightSettingModal';
 import Strings from '@i18n';
+import { putSetScene, getSceneId } from './helper';
+
 const {
   convertX: cx,
   width: deviceWidth,
@@ -35,6 +37,19 @@ const Layout: React.FC = props => {
   const dispatch = useDispatch();
   const cRef = useRef(null);
   const [editIndex, setEditIndex] = React.useState(0);
+
+  const [activeId, setActiveId] = React.useState(-1);
+
+  setTimeout(() => {
+    if (activeId === -1) {
+      if (dpState.plant_scene_data) {
+        const id = parseInt(dpState.plant_scene_data.substr(0, 2), 16);
+        setCurrentScene(id);
+      } else {
+        setCurrentScene(0);
+      }
+    }
+  }, 0);
 
   /**
    * Handlers
@@ -68,11 +83,8 @@ const Layout: React.FC = props => {
       onMaskPress: ({ close }) => close(),
       onSelect: (value, { close: popupClose }) => {
         if (value === 'use') {
-          TYSdk.device.putDeviceData(item.setting);
           popupClose();
-          TYSdk.Navigator.push({
-            id: 'main',
-          });
+          setCurrentScene(item.id);
         } else if (value === 'edit') {
           popupClose();
           setTimeout(() => {
@@ -84,7 +96,11 @@ const Layout: React.FC = props => {
             cancelText: Strings.getLang('cancel'),
             confirmText: Strings.getLang('confirm'),
             onConfirm: (data, { close: confirmClose }) => {
+              const deleteItem = scene[current][index];
               dispatch(actions.product.deleteScene({ index }));
+              if (deleteItem.id === activeId) {
+                setCurrentScene(0);
+              }
               confirmClose();
               popupClose();
             },
@@ -111,12 +127,14 @@ const Layout: React.FC = props => {
       });
   }
 
-  function handleModalConfirm({ type, name, setting }) {
+  function handleModalConfirm({ type, name, setting, multiwaySwitch }) {
     if (type === 'add-scene') {
       dispatch(
         actions.product.addScene({
           name,
           setting,
+          multiwaySwitch,
+          id: getSceneId(scene, current),
         })
       );
     } else if (type === 'edit-scene') {
@@ -125,14 +143,73 @@ const Layout: React.FC = props => {
           index: editIndex,
           name,
           setting,
+          multiwaySwitch,
         })
       );
     }
   }
 
+  const setCurrentScene = id => {
+    if (id === 0 || id === 1 || id === 2) {
+      TYSdk.device.putDeviceData({
+        plant_scene_data: '0' + id,
+      });
+      setActiveId(id);
+    } else {
+      const items = scene[current].filter(s => s.id === id);
+      if (items.length > 0) {
+        putSetScene(items[0]);
+        setActiveId(id);
+      } else {
+        TYSdk.device.putDeviceData({
+          plant_scene_data: '00',
+        });
+        setActiveId(0);
+      }
+    }
+  };
+
   /**
    * Renders
    */
+  const renderRecommendSceneItems = () => {
+    const items = [
+      {
+        name: '幼苗期',
+        value: '00',
+        id: 0,
+      },
+      {
+        name: '成长期',
+        value: '01',
+        id: 1,
+      },
+      {
+        name: '开花期',
+        value: '02',
+        id: 2,
+      },
+    ];
+    return (
+      <View style={styles.sceneItems}>
+        {items.map((item, index) => {
+          return (
+            <Button
+              textStyle={styles.sceneItemText}
+              style={{
+                ...styles.sceneItem,
+                backgroundColor: activeId === item.id ? color.dark : '#409eff',
+              }}
+              text={item.name}
+              onPress={() => setCurrentScene(item.id)}
+            ></Button>
+          );
+        })}
+        <Button style={styles.scenePlaceItems} />
+        <Button style={styles.scenePlaceItems} />
+      </View>
+    );
+  };
   const renderSceneItems = () => {
     if (scene && scene[current] && scene[current].length > 0) {
       return (
@@ -141,7 +218,10 @@ const Layout: React.FC = props => {
             return (
               <Button
                 textStyle={styles.sceneItemText}
-                style={styles.sceneItem}
+                style={{
+                  ...styles.sceneItem,
+                  backgroundColor: activeId === item.id ? color.dark : '#409eff',
+                }}
                 text={item.name}
                 onPress={() => handleScenePress(item, index)}
               ></Button>
@@ -194,7 +274,18 @@ const Layout: React.FC = props => {
 
   return (
     <View style={{ flex: 1 }}>
-      <ScrollView>{renderSceneItems()}</ScrollView>
+      <ScrollView>
+        <TYText style={styles.title} text="推荐" />
+        {renderRecommendSceneItems()}
+        <TYText
+          style={{
+            ...styles.title,
+            display: scene && scene[current] && scene[current].length > 0 ? 'flex' : 'none',
+          }}
+          text="自定义"
+        />
+        {renderSceneItems()}
+      </ScrollView>
       {renderAddButton()}
       <LightSettingModal
         ref={cRef}
@@ -206,6 +297,12 @@ const Layout: React.FC = props => {
 };
 
 const styles = StyleSheet.create({
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    margin: cx(16),
+    color: color.text,
+  },
   /* Scene Items */
   sceneItems: {
     display: 'flex',

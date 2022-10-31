@@ -170,11 +170,15 @@ const composeLayout = (store: Store, component: React.ComponentType) => {
                             iconColor: color.primary,
                             // type: 'primary',
                             // text: '灯光',
-                            onPress: () =>
+                            onPress: () => {
                               TYSdk.Navigator.push({
                                 id: 'main',
                                 title: 'light setting',
-                              }),
+                              });
+                              TYSdk.device.putDeviceData({
+                                work_mode: 'white',
+                              });
+                            },
                           },
                           {
                             size: 40,
@@ -195,11 +199,15 @@ const composeLayout = (store: Store, component: React.ComponentType) => {
                             iconSize: 32,
                             iconColor: color.primary,
                             // text: '场景',
-                            onPress: () =>
+                            onPress: () => {
                               TYSdk.Navigator.push({
                                 id: 'scene',
                                 title: 'scene',
-                              }),
+                              });
+                              TYSdk.device.putDeviceData({
+                                work_mode: 'scene',
+                              });
+                            },
                           },
                           {
                             size: 40,

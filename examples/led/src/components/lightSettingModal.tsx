@@ -1,6 +1,16 @@
 import _ from 'lodash';
 import { StyleSheet, View, Image, ScrollView, TextInput, Modal } from 'react-native';
-import { TYSdk, Utils, Button, TYText, Slider, Stepper, Toast } from 'tuya-panel-kit';
+import {
+  TYSdk,
+  Utils,
+  Button,
+  TYText,
+  Slider,
+  Stepper,
+  Toast,
+  Divider,
+  SwitchButton,
+} from 'tuya-panel-kit';
 import React, { forwardRef, useImperativeHandle } from 'react';
 
 import { commonStyles } from 'style/common';
@@ -11,6 +21,10 @@ import { useSelector, actions } from '@models';
 import { color, productConfig } from '@config';
 
 import Res from '@res';
+import Strings from '@i18n';
+
+const { channelSchemaMap, schemaChanelMap } = productConfig.maps;
+const { switchSchema } = productConfig;
 
 const {
   convertX: cx,
@@ -29,6 +43,9 @@ const Layout = forwardRef((props, ref) => {
   const [setting, setSetting] = React.useState(() => productConfig.defaultSetting[current]);
   const [name, setName] = React.useState(() => '');
   const [type, setType] = React.useState(() => 'common');
+  const [multiwaySwitch, setMultiwaySwitch] = React.useState(
+    () => productConfig.defaultSwitch[current]
+  );
 
   const [myToast, setMyToast] = React.useState({ visible: false, text: '' });
 
@@ -36,16 +53,30 @@ const Layout = forwardRef((props, ref) => {
     open,
   }));
 
-  function open({ type = '', name = '', setting = productConfig.defaultSetting[current] } = {}) {
+  function open({
+    type = '',
+    name = '',
+    setting = productConfig.defaultSetting[current],
+    multiwaySwitch = productConfig.defaultSwitch[current],
+  } = {}) {
     setType(type);
     setName(name);
     setSetting(setting);
     setVisible(true);
+    setMultiwaySwitch(multiwaySwitch);
   }
 
   /**
    * Getters
    */
+  const controlItemSwitchGetter = key => {
+    if (multiwaySwitch[key]) {
+      return multiwaySwitch[key];
+    } else {
+      return true;
+    }
+  };
+
   const controlItemLabelGetter = key => {
     if (devInfo.schema && devInfo.schema[key] && devInfo.schema[key].name) {
       return devInfo.schema[key].name;
@@ -74,6 +105,13 @@ const Layout = forwardRef((props, ref) => {
     setRecommendSource(Res.cat);
   }, 200);
 
+  const handleMultiwaySwitch = (key, value) => {
+    setMultiwaySwitch({
+      ...multiwaySwitch,
+      [key]: value,
+    });
+  };
+
   const onCancel = function () {
     props.onCancel && props.onCancel();
     setVisible(false);
@@ -88,7 +126,8 @@ const Layout = forwardRef((props, ref) => {
         });
       }
     }
-    props.onConfirm && props.onConfirm({ type, setting, name, img: recommendSource });
+    props.onConfirm &&
+      props.onConfirm({ type, setting, name, img: recommendSource, multiwaySwitch });
     setVisible(false);
   };
 
@@ -151,45 +190,83 @@ const Layout = forwardRef((props, ref) => {
   const renderControl = () => {
     return (
       <View style={commonStyles.card}>
-        <TYText text="自定义" size={18} />
+        <TYText
+          style={{
+            marginBottom: 12,
+          }}
+          text={Strings.getLang('custom_bright')}
+          size={18}
+        />
         {productConfig.controlSchema[current].map(key => (
-          <View
-            style={{
-              display: 'flex',
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-            }}
-          >
-            <TYText style={{ width: cx(96) }} text={controlItemLabelGetter(key)} size={18} />
-            <Slider.Horizontal
-              theme={{
-                trackRadius: 3,
-                trackHeight: 6,
-                thumbSize: 26,
-                thumbRadius: 26,
-                thumbTintColor: '#FFF',
-                minimumTrackTintColor: '#F84803',
-                maximumTrackTintColor: '#E5E5E5',
-              }}
-              maximumValue={100}
-              minimumValue={1}
-              style={{ width: cx(120), height: cx(36) }}
-              value={controlItemValueGetter(key)}
-              onSlidingComplete={v => handleControlValueChange(key, v)}
-            />
-            <Stepper
+          <View>
+            <Divider style={{ marginVertical: 12 }}></Divider>
+            <View
               style={{
-                width: cx(92),
+                height: 40,
+                display: 'flex',
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'space-between',
               }}
-              max={100}
-              min={1}
-              buttonStyle={styles.stepButtonStyle}
-              inputStyle={styles.stepInputStyle}
-              editable={true}
-              value={controlItemValueGetter(key)}
-              onValueChange={v => handleControlValueChange(key, v)}
-            />
+            >
+              <TYText style={{ width: cx(96) }} text={controlItemLabelGetter(key)} size={18} />
+              <SwitchButton
+                style={{
+                  display: switchSchema[current].includes(key) ? 'flex' : 'none',
+                }}
+                value={multiwaySwitch[key]}
+                size={{
+                  activeSize: 18,
+                  margin: 5,
+                  width: 52,
+                  height: 28,
+                  borderRadius: 10,
+                }}
+                theme={{ onTintColor: '#57BCFB', onThumbTintColor: '#FFF' }}
+                thumbStyle={{ width: 18, height: 18, borderRadius: 6 }}
+                onText="ON"
+                offText="OFF"
+                onValueChange={v => handleMultiwaySwitch(key, v)}
+              />
+            </View>
+            <View
+              style={{
+                display:
+                  !switchSchema[current].includes(key) || multiwaySwitch[key] ? 'flex' : 'none',
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+              }}
+            >
+              <Slider.Horizontal
+                theme={{
+                  trackRadius: 3,
+                  trackHeight: 6,
+                  thumbSize: 26,
+                  thumbRadius: 26,
+                  thumbTintColor: '#FFF',
+                  minimumTrackTintColor: '#F84803',
+                  maximumTrackTintColor: '#E5E5E5',
+                }}
+                maximumValue={100}
+                minimumValue={1}
+                style={{ width: cx(180), height: cx(36) }}
+                value={controlItemValueGetter(key)}
+                onSlidingComplete={v => handleControlValueChange(key, v)}
+              />
+              <Stepper
+                style={{
+                  width: cx(92),
+                }}
+                max={100}
+                min={1}
+                buttonStyle={styles.stepButtonStyle}
+                inputStyle={styles.stepInputStyle}
+                editable={true}
+                value={controlItemValueGetter(key)}
+                onValueChange={v => handleControlValueChange(key, v)}
+              />
+            </View>
           </View>
         ))}
       </View>

@@ -124,13 +124,15 @@ export const product = handleActions<any>(
       };
     },
     ADD_SCENE: (state, action) => {
-      const { name, setting } = action.payload;
+      const { name, setting, multiwaySwitch, id } = action.payload;
       const current = state.current;
       const productScene = state.scene[current] || [];
 
       const newProductScene = productScene.concat({
         name,
         setting,
+        multiwaySwitch,
+        id,
       });
 
       const newSceneList = {
@@ -148,7 +150,7 @@ export const product = handleActions<any>(
       };
     },
     CHANGE_SCENE: (state, action) => {
-      const { index, name, setting } = action.payload;
+      const { index, name, setting, multiwaySwitch } = action.payload;
       const current = state.current;
       const productScene = state.scene[current] || [];
 
@@ -156,6 +158,7 @@ export const product = handleActions<any>(
         if (sIndex === index) {
           sItem.name = name;
           sItem.setting = setting;
+          sItem.multiwaySwitch = multiwaySwitch;
         }
         return sItem;
       });

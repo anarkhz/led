@@ -10,6 +10,7 @@ import {
   SwitchButton,
   Popup,
   Dialog,
+  Divider,
 } from 'tuya-panel-kit';
 import React from 'react';
 import { commonStyles } from 'style/common';
@@ -17,11 +18,12 @@ import { commonStyles } from 'style/common';
 import { useDispatch } from 'react-redux';
 import { useSelector, actions } from '@models';
 
-// import { useSettingConfig } from './service';
-
 import { color, productConfig } from '@config';
 import Res from '@res';
 import Strings from '@i18n';
+
+const { channelSchemaMap, schemaChanelMap } = productConfig.maps;
+
 const { convertX: cx, width: deviceWidth, height: deviceHeight } = Utils.RatioUtils;
 
 const Layout: React.FC = () => {
@@ -30,9 +32,39 @@ const Layout: React.FC = () => {
   const current = useSelector(state => state.product.current);
   const dispatch = useDispatch();
   const [recommendSource, setRecommendSource] = React.useState(Res.cat);
+
   /**
    * Getters
    */
+  const multiwaySwitchGetter = () => {
+    const multiway_switch = dpState.multiway_switch;
+    if (!multiway_switch || multiway_switch.length === 0) return;
+    const result = {};
+    const valueMap = {
+      '00': false,
+      '01': true,
+    };
+
+    for (let i = 0; i < multiway_switch.length; i += 4) {
+      const keyStr = multiway_switch.substr(i, 2);
+      const valueStr = multiway_switch.substr(i + 2, 2);
+      const channel = channelSchemaMap[keyStr];
+      const value = valueMap[valueStr];
+      if (result[channel] === undefined) result[channel] = value;
+    }
+    return result;
+  };
+
+  const controlItemSwitchGetter = key => {
+    if (dpState.multiway_switch) {
+      const multiwaySwitch = multiwaySwitchGetter();
+      if (multiwaySwitch) return multiwaySwitch[key];
+      return true;
+    } else {
+      return true;
+    }
+  };
+
   const controlItemLabelGetter = key => {
     if (devInfo.schema && devInfo.schema[key] && devInfo.schema[key].name) {
       return devInfo.schema[key].name;
@@ -78,7 +110,7 @@ const Layout: React.FC = () => {
           Dialog.checkbox({
             title: Strings.getLang('choose'),
             cancelText: Strings.getLang('cancel'),
-            confirmText:Strings.getLang('confirm'),
+            confirmText: Strings.getLang('confirm'),
             type: 'radio',
             maxItemNum: 7,
             value: current,
@@ -92,6 +124,26 @@ const Layout: React.FC = () => {
           });
         }
       },
+    });
+  };
+
+  const handleMultiwaySwitch = (key, value) => {
+    const result = [] as any;
+    productConfig.controlSchema[current].forEach(schemaKey => {
+      if (schemaChanelMap[schemaKey]) {
+        if (schemaKey === key) {
+          result.push(schemaChanelMap[schemaKey] + (value ? '01' : '00'));
+        } else {
+          result.push(
+            schemaChanelMap[schemaKey] + (controlItemSwitchGetter(schemaKey) ? '01' : '00')
+          );
+        }
+      }
+    });
+    const putData = result.sort().join('');
+
+    TYSdk.device.putDeviceData({
+      multiway_switch: putData,
     });
   };
 
@@ -135,45 +187,86 @@ const Layout: React.FC = () => {
   const renderControl = () => {
     return (
       <View style={commonStyles.card}>
-        <TYText text={Strings.getLang('custom_bright')} size={18} />
+        <TYText
+          style={{
+            marginBottom: 12,
+          }}
+          text={Strings.getLang('custom_bright')}
+          size={18}
+        />
         {productConfig.controlSchema[current].map(key => (
-          <View
-            style={{
-              display: 'flex',
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-            }}
-          >
-            <TYText style={{ width: cx(96) }} text={controlItemLabelGetter(key)} size={18} />
-            <Slider.Horizontal
-              theme={{
-                trackRadius: 3,
-                trackHeight: 6,
-                thumbSize: 26,
-                thumbRadius: 26,
-                thumbTintColor: '#FFF',
-                minimumTrackTintColor: '#F84803',
-                maximumTrackTintColor: '#E5E5E5',
-              }}
-              maximumValue={100}
-              minimumValue={1}
-              style={{ width: cx(120), height: cx(36) }}
-              value={controlItemValueGetter(key)}
-              onSlidingComplete={v => handleControlValueChange(key, v)}
-            />
-            <Stepper
+          <View>
+            <Divider style={{ marginVertical: 12 }}></Divider>
+            <View
               style={{
-                width: cx(92),
+                height: 40,
+                // marginTop: 12,
+                display: 'flex',
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'space-between',
               }}
-              max={100}
-              min={1}
-              buttonStyle={styles.stepButtonStyle}
-              inputStyle={styles.stepInputStyle}
-              editable={true}
-              value={controlItemValueGetter(key)}
-              onValueChange={v => handleControlValueChange(key, v)}
-            />
+            >
+              <TYText style={{ width: cx(96) }} text={controlItemLabelGetter(key)} size={18} />
+              <SwitchButton
+                style={{
+                  display: key === 'all_bright' ? 'none' : 'flex',
+                }}
+                value={controlItemSwitchGetter(key)}
+                size={{
+                  activeSize: 18,
+                  margin: 5,
+                  width: 52,
+                  height: 28,
+                  borderRadius: 10,
+                }}
+                theme={{ onTintColor: '#57BCFB', onThumbTintColor: '#FFF' }}
+                thumbStyle={{ width: 18, height: 18, borderRadius: 6 }}
+                onText="ON"
+                offText="OFF"
+                onValueChange={v => handleMultiwaySwitch(key, v)}
+              />
+            </View>
+            <View
+              style={{
+                display: key === 'all_bright' || controlItemSwitchGetter(key) ? 'flex' : 'none',
+                // marginBottom: 12,
+                // display: 'flex',
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+              }}
+            >
+              {/* <TYText style={{ width: cx(96) }} text={controlItemLabelGetter(key)} size={18} /> */}
+              <Slider.Horizontal
+                theme={{
+                  trackRadius: 3,
+                  trackHeight: 6,
+                  thumbSize: 26,
+                  thumbRadius: 26,
+                  thumbTintColor: '#FFF',
+                  minimumTrackTintColor: '#F84803',
+                  maximumTrackTintColor: '#E5E5E5',
+                }}
+                maximumValue={100}
+                minimumValue={1}
+                style={{ width: cx(180), height: cx(36) }}
+                value={controlItemValueGetter(key)}
+                onSlidingComplete={v => handleControlValueChange(key, v)}
+              />
+              <Stepper
+                style={{
+                  width: cx(92),
+                }}
+                max={100}
+                min={1}
+                buttonStyle={styles.stepButtonStyle}
+                inputStyle={styles.stepInputStyle}
+                editable={true}
+                value={controlItemValueGetter(key)}
+                onValueChange={v => handleControlValueChange(key, v)}
+              />
+            </View>
           </View>
         ))}
       </View>

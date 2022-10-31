@@ -48,7 +48,7 @@ export function getLoopDaysLabel(loopDays) {
   }
 }
 
-export function binStrToHex(str, digit, padNum = '0') {
+export function binStrToHex(str, digit?, padNum = '0') {
   const decimal = parseInt(str, 2);
   return digit ? decimal.toString(16).padStart(digit, padNum) : decimal.toString(16);
 }

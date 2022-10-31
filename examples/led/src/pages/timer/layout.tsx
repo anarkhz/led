@@ -23,6 +23,7 @@ import { color, icon } from '@config';
 import { commonStyles } from 'style/common';
 import { minToTimeStr, getLoopDaysLabel, binStrToHex } from '@utils';
 import Strings from '@i18n';
+import { putSetTimer, putDeleteTimer } from './helper';
 const { convertX: cx, width: deviceWidth, height: deviceHeight } = Utils.RatioUtils;
 
 const Layout: React.FC = () => {
@@ -34,6 +35,24 @@ const Layout: React.FC = () => {
   // const [editIndex, setEditIndex] = React.useState(0);
 
   const handleTimerRunning = (index, item, running) => {
+    function isVaild() {
+      const { startTime, endTime } = item;
+      const allRunningTimers = timer[current].filter(item => item.running);
+      const runningDuration = allRunningTimers.map(item => [item.startTime, item.endTime]);
+      // const sortDuration = runningDuration.sort()
+      const target = runningDuration.concat([startTime, endTime]);
+      if (target.flat().sort().join() === target.flat().join()) {
+        return true;
+      } else {
+        return false;
+      }
+    }
+    if (!isVaild()) {
+      return GlobalToast.show({
+        text: '定时时间有冲突',
+        showIcon: false,
+      });
+    }
     dispatch(
       actions.product.changeTimer({
         index: index,
@@ -43,33 +62,7 @@ const Layout: React.FC = () => {
         },
       })
     );
-
-    const getBinWeek = () => {
-      let result = [0, 0, 0, 0, 0, 0, 0, 0];
-      item.loopDays.forEach(item => {
-        result[item - 1] = 1;
-      });
-      return result.join('');
-    };
-
-    const rtc_bin_running = running ? '1' : '0';
-    const rtc_bin_id = '0000000'; // id占位
-    const rtc_hex_timer_type = '01';
-    const rtc_bin_week = getBinWeek();
-    const rtc_hex_time_type = '00';
-    const rtc_hex_time = item.startTime.toString(16).padStart(2, '0'); // 先用startTime
-    const rtc_hex_action = 'FFFFFFF'; // 参数有问题
-
-    TYSdk.device.putDeviceData({
-      rtc_timer:
-        binStrToHex(rtc_bin_running + rtc_bin_id, 2) +
-        rtc_hex_timer_type +
-        binStrToHex(rtc_bin_week, 2) +
-        rtc_hex_time_type +
-        rtc_hex_time +
-        rtc_hex_action,
-      timer_report: binStrToHex(rtc_bin_running + rtc_bin_id, 2),
-    });
+    putSetTimer(item.id, item, running);
   };
   const handleTimerPress = (item, index) => {
     Popup.list({
@@ -88,7 +81,7 @@ const Layout: React.FC = () => {
         // },
         {
           key: '2',
-          title:Strings.getLang('del_timer'),
+          title: Strings.getLang('del_timer'),
           value: 'delete',
         },
       ],
@@ -101,11 +94,12 @@ const Layout: React.FC = () => {
       onSelect: (value, { close: popupClose }) => {
         if (value === 'delete') {
           Dialog.confirm({
-            title:Strings.getLang('del_timer_question'),
+            title: Strings.getLang('del_timer_question'),
             cancelText: Strings.getLang('cancel'),
             confirmText: Strings.getLang('confirm'),
             onConfirm: (data, { close: confirmClose }) => {
               dispatch(actions.product.deleteTimer({ index }));
+              putDeleteTimer(item.id);
               confirmClose();
               popupClose();
             },
@@ -119,12 +113,12 @@ const Layout: React.FC = () => {
    * Handlers
    */
   function handleAddTimer() {
-    // if (timer[current].length >= 10) {
-    //   return GlobalToast.show({
-    //     text: '最多10个定时',
-    //     showIcon: false,
-    //   });
-    // }
+    if (timer[current].length >= 10) {
+      return GlobalToast.show({
+        text: '最多10个定时',
+        showIcon: false,
+      });
+    }
     TYSdk.Navigator.push({
       id: 'timer-add',
     });

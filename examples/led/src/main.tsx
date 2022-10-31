@@ -73,6 +73,15 @@ class MainLayout extends NavigatorLayout<Props> {
    * 具体可控制的参数可参考 NavigationOptions 类型描述
    */
   hookRoute(route: DeprecatedNavigatorRoute): NavigationOptions {
+    if (route.initialRoute) {
+      const { dpState } = store.getState();
+      if (dpState.work_mode === 'white') {
+        route.id = 'main';
+      } else if (dpState.work_mode === 'scene') {
+        route.id = 'scene';
+      }
+    }
+
     const currentRoute = routers.find(r => r.id === route.id);
 
     return {
