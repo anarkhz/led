@@ -23,6 +23,7 @@ import Res from '@res';
 import Strings from '@i18n';
 
 const { channelSchemaMap, schemaChanelMap } = productConfig.maps;
+const { switchSchema } = productConfig;
 
 const { convertX: cx, width: deviceWidth, height: deviceHeight } = Utils.RatioUtils;
 
@@ -194,84 +195,100 @@ const Layout: React.FC = () => {
           text={Strings.getLang('custom_bright')}
           size={18}
         />
-        {productConfig.controlSchema[current].map(key => (
-          <View>
-            <Divider style={{ marginVertical: 12 }}></Divider>
-            <View
-              style={{
-                height: 40,
-                // marginTop: 12,
-                display: 'flex',
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-              }}
-            >
-              <TYText style={{ width: cx(96) }} text={controlItemLabelGetter(key)} size={18} />
-              <SwitchButton
-                style={{
-                  display: key === 'all_bright' ? 'none' : 'flex',
-                }}
-                value={controlItemSwitchGetter(key)}
-                size={{
-                  activeSize: 18,
-                  margin: 5,
-                  width: 52,
-                  height: 28,
-                  borderRadius: 10,
-                }}
-                theme={{ onTintColor: '#57BCFB', onThumbTintColor: '#FFF' }}
-                thumbStyle={{ width: 18, height: 18, borderRadius: 6 }}
-                onText="ON"
-                offText="OFF"
-                onValueChange={v => handleMultiwaySwitch(key, v)}
-              />
-            </View>
-            <View
-              style={{
-                display: key === 'all_bright' || controlItemSwitchGetter(key) ? 'flex' : 'none',
-                // marginBottom: 12,
-                // display: 'flex',
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-              }}
-            >
-              {/* <TYText style={{ width: cx(96) }} text={controlItemLabelGetter(key)} size={18} /> */}
-              <Slider.Horizontal
-                theme={{
-                  trackRadius: 3,
-                  trackHeight: 6,
-                  thumbSize: 26,
-                  thumbRadius: 26,
-                  thumbTintColor: '#FFF',
-                  minimumTrackTintColor: '#F84803',
-                  maximumTrackTintColor: '#E5E5E5',
-                }}
-                maximumValue={100}
-                minimumValue={1}
-                style={{ width: cx(180), height: cx(36) }}
-                value={controlItemValueGetter(key)}
-                onSlidingComplete={v => handleControlValueChange(key, v)}
-              />
-              <Stepper
-                style={{
-                  width: cx(92),
-                }}
-                max={100}
-                min={1}
-                buttonStyle={styles.stepButtonStyle}
-                inputStyle={styles.stepInputStyle}
-                editable={true}
-                value={controlItemValueGetter(key)}
-                onValueChange={v => handleControlValueChange(key, v)}
-              />
-            </View>
-          </View>
-        ))}
+        {renderControlItems}
       </View>
     );
   };
+
+  const renderControlItems = productConfig.controlSchema[current].map(key => {
+    const isShowButton = switchSchema[current].includes(key);
+    const isShowSlider = !isShowButton || controlItemSwitchGetter(key);
+    const renderSwitchButton = () => {
+      if (isShowButton) {
+        return (
+          <SwitchButton
+            value={controlItemSwitchGetter(key)}
+            size={{
+              activeSize: 18,
+              margin: 5,
+              width: 52,
+              height: 28,
+              borderRadius: 10,
+            }}
+            theme={{ onTintColor: '#57BCFB', onThumbTintColor: '#FFF' }}
+            thumbStyle={{ width: 18, height: 18, borderRadius: 6 }}
+            onText="ON"
+            offText="OFF"
+            onValueChange={v => handleMultiwaySwitch(key, v)}
+          />
+        );
+      } else {
+        return null;
+      }
+    };
+    const renderSlider = () => {
+      if (isShowSlider) {
+        return (
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+            }}
+          >
+            <Slider.Horizontal
+              theme={{
+                trackRadius: 3,
+                trackHeight: 6,
+                thumbSize: 26,
+                thumbRadius: 26,
+                thumbTintColor: '#FFF',
+                minimumTrackTintColor: '#F84803',
+                maximumTrackTintColor: '#E5E5E5',
+              }}
+              maximumValue={100}
+              minimumValue={1}
+              style={{ width: cx(180), height: cx(36) }}
+              value={controlItemValueGetter(key)}
+              onSlidingComplete={v => handleControlValueChange(key, v)}
+            />
+            <Stepper
+              style={{
+                width: cx(92),
+              }}
+              max={100}
+              min={1}
+              buttonStyle={styles.stepButtonStyle}
+              inputStyle={styles.stepInputStyle}
+              editable={true}
+              value={controlItemValueGetter(key)}
+              onValueChange={v => handleControlValueChange(key, v)}
+            />
+          </View>
+        );
+      } else {
+        return null;
+      }
+    };
+    return (
+      <View>
+        <Divider style={{ marginVertical: 12 }}></Divider>
+        <View
+          style={{
+            height: 40,
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+          }}
+        >
+          <TYText style={{ width: cx(96) }} text={controlItemLabelGetter(key)} size={18} />
+          {renderSwitchButton()}
+        </View>
+        {renderSlider()}
+      </View>
+    );
+  });
 
   const renderOperation = () => {
     return (
@@ -326,15 +343,7 @@ const styles = StyleSheet.create({
     width: cx(72),
     height: cx(36),
     borderRadius: cx(4),
-    // borderWidth: cx(1),
     backgroundColor: color.young,
-    // shadowColor: '#000',
-    // shadowOffset: {
-    //   width: 0,
-    //   height: 1,
-    // },
-    // shadowOpacity: 0.5,
-    // shadowRadius: 8,
     elevation: 8,
     marginVertical: cx(6),
   },
@@ -358,7 +367,7 @@ const styles = StyleSheet.create({
     width: cx(28),
   },
   stepInputStyle: {
-    width: cx(24),
+    width: cx(36),
   },
   /**
    * Switch

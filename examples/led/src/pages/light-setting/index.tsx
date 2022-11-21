@@ -1,5 +1,5 @@
 import { StyleSheet, View } from 'react-native';
-import { TYText } from 'tuya-panel-kit';
+import { TYText, Stepper } from 'tuya-panel-kit';
 import React from 'react';
 
 import Layout from './layout';

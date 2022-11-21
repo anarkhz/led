@@ -2,9 +2,6 @@ import { StyleSheet, View, ScrollView, TextInput } from 'react-native';
 import { TYSdk, Utils, Button, TYText, Slider, Stepper } from 'tuya-panel-kit';
 import React from 'react';
 
-import { useDispatch } from 'react-redux';
-import { useSelector, actions } from '@models';
-
 import { commonStyles } from 'style/common';
 import { timeRecommend } from './service';
 
@@ -42,12 +39,12 @@ const Layout: React.FC = () => {
   const renderHeader = () => {
     return (
       <View style={commonStyles.line}>
-        <TYText text={Strings.getLang("switch_gradient")} size={18} />
+        <TYText text={Strings.getLang('switch_gradient')} size={18} />
         <TextInput
           style={styles.titleInput}
           keyboardType="numeric"
           maxLength={3}
-          placeholder={Strings.getLang("input_switch_gradient_hint")}
+          placeholder={Strings.getLang('input_switch_gradient_hint')}
           value={openTime.toString()}
           onChangeText={handleInputChange}
         ></TextInput>
@@ -93,7 +90,7 @@ const Layout: React.FC = () => {
           }}
           maximumValue={180}
           minimumValue={0}
-          style={{ width: cx(160), height: cx(36) }}
+          style={{ width: cx(140), height: cx(36) }}
           value={openTime}
           onSlidingComplete={handleTimeChange}
         />
@@ -164,7 +161,7 @@ const styles = StyleSheet.create({
     width: cx(28),
   },
   stepInputStyle: {
-    width: cx(24),
+    width: cx(36),
   },
 });
 

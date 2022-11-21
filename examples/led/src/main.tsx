@@ -7,6 +7,7 @@ import {
   NavigationOptions,
   DeprecatedNavigator,
   DeprecatedNavigatorRoute,
+  TopBar,
 } from 'tuya-panel-kit';
 import composeLayout from './composeLayout';
 import { store, ReduxState, actions } from './models';
@@ -17,6 +18,7 @@ import LightSetting from './pages/light-setting';
 import Scene from './pages/scene';
 import Timer from './pages/timer';
 import TimerAdd from './pages/timer/timerAdd';
+import TimerEdit from './pages/timer/timerEdit';
 
 console.disableYellowBox = true;
 
@@ -27,37 +29,75 @@ type Props = ReduxState & { dispatch: Dispatch };
 //   console.log('TYSdk :', TYSdk);
 // }
 
+const topBarRenderer = (isPop = false) => (
+  <TopBar
+    style={{ height: 48 }}
+    contentStyle={{ height: 48, marginTop: 0 }}
+    background="#fff"
+    title={'头部栏'}
+    color="red"
+    titleStyle={{
+      color: '#4C4C4C',
+    }}
+    leftActions={[
+      {
+        name: 'backIos',
+        color: '#4C4C4C',
+        onPress: () => (isPop ? TYSdk.Navigator.pop() : TYSdk.mobile.back()),
+      },
+    ]}
+    actions={[
+      {
+        name: 'pen',
+        color: '#4C4C4C',
+        onPress: () => TYSdk.native.showDeviceMenu(),
+      },
+    ]}
+  />
+);
+
 const routers = [
   {
     id: 'main',
     title: '灯光设置',
-    hideFooter: false,
     component: props => <LightSetting {...props} />,
+    topBar: topBarRenderer(),
   },
   {
     id: 'switch-product',
     title: '选择产品',
     component: props => <SwitchProduct {...props} />,
+    topBar: topBarRenderer(),
   },
   {
     id: 'switch-gradient',
     title: '灯光渐变',
     component: props => <SwitchGradient {...props} />,
+    topBar: topBarRenderer(),
   },
   {
     id: 'scene',
     title: '我的场景',
     component: props => <Scene {...props} />,
+    topBar: topBarRenderer(),
   },
   {
     id: 'timer',
     title: '定时设置',
     component: props => <Timer {...props} />,
+    topBar: topBarRenderer(),
   },
   {
     id: 'timer-add',
     title: '添加定时',
     component: props => <TimerAdd {...props} />,
+    topBar: topBarRenderer(true),
+  },
+  {
+    id: 'timer-edit',
+    title: '编辑定时',
+    component: props => <TimerEdit {...props} />,
+    topBar: topBarRenderer(true),
   },
   // {
   //   id: 'home',
@@ -87,7 +127,7 @@ class MainLayout extends NavigatorLayout<Props> {
     return {
       ...route,
       title: currentRoute?.title,
-      renderStatusBar: () => <StatusBar barStyle="default" />,
+      renderTopBar: () => currentRoute?.topBar,
     };
   }
 

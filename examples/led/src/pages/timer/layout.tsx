@@ -26,7 +26,7 @@ import Strings from '@i18n';
 import { putSetTimer, putDeleteTimer } from './helper';
 const { convertX: cx, width: deviceWidth, height: deviceHeight } = Utils.RatioUtils;
 
-const Layout: React.FC = () => {
+const Layout: React.FC = props => {
   const dpState = useSelector(state => state.dpState);
   const devInfo = useSelector(state => state.devInfo);
   const product = useSelector(state => state.product);
@@ -35,19 +35,20 @@ const Layout: React.FC = () => {
   // const [editIndex, setEditIndex] = React.useState(0);
 
   const handleTimerRunning = (index, item, running) => {
-    function isVaild() {
+    function isTimeVaild() {
       const { startTime, endTime } = item;
-      const allRunningTimers = timer[current].filter(item => item.running);
-      const runningDuration = allRunningTimers.map(item => [item.startTime, item.endTime]);
+      const allRunningTimers = timer[current]?.filter(item => item.running);
+      const runningDuration = allRunningTimers?.map(item => [item.startTime, item.endTime]);
       // const sortDuration = runningDuration.sort()
-      const target = runningDuration.concat([startTime, endTime]);
-      if (target.flat().sort().join() === target.flat().join()) {
+      const target = runningDuration?.concat([startTime, endTime]);
+
+      if (target && target.flat().sort().join() === target.flat().join()) {
         return true;
       } else {
         return false;
       }
     }
-    if (!isVaild()) {
+    if (running && !isTimeVaild()) {
       return GlobalToast.show({
         text: '定时时间有冲突',
         showIcon: false,
@@ -74,11 +75,11 @@ const Layout: React.FC = () => {
         //   title: '应用场景',
         //   value: 'use',
         // },
-        // {
-        //   key: '1',
-        //   title: '编辑场景',
-        //   value: 'edit',
-        // },
+        {
+          key: '1',
+          title: '编辑定时',
+          value: 'edit',
+        },
         {
           key: '2',
           title: Strings.getLang('del_timer'),
@@ -104,6 +105,14 @@ const Layout: React.FC = () => {
               popupClose();
             },
           });
+        } else if (value === 'edit') {
+          popupClose();
+          setTimeout(() => {
+            TYSdk.Navigator.push({
+              id: 'timer-edit',
+              editIndex: 0,
+            });
+          }, 500);
         }
       },
     });
@@ -113,7 +122,7 @@ const Layout: React.FC = () => {
    * Handlers
    */
   function handleAddTimer() {
-    if (timer[current].length >= 10) {
+    if (timer[current] && timer[current].length >= 10) {
       return GlobalToast.show({
         text: '最多10个定时',
         showIcon: false,
@@ -146,7 +155,7 @@ const Layout: React.FC = () => {
                   <View style={styles.timerDesc}>
                     <TYText
                       style={styles.timeText}
-                      size={32}
+                      size={28}
                       text={minToTimeStr(item.startTime) + ' - ' + minToTimeStr(item.endTime)}
                     ></TYText>
                     <View style={[commonStyles.line]}>
@@ -233,42 +242,6 @@ const styles = StyleSheet.create({
   timeText: {
     alignSelf: 'center',
     color: color.dark,
-  },
-  sceneAddContainer: {
-    display: 'flex',
-    flexDirection: 'row-reverse',
-  },
-  sceneAddButton: {
-    width: cx(72),
-    height: cx(36),
-    backgroundColor: '#409eff',
-    borderRadius: cx(4),
-  },
-  sceneItems: {
-    display: 'flex',
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    paddingHorizontal: cx(12),
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
-    shadowOpacity: 0.5,
-    shadowRadius: 8,
-  },
-  sceneItem: {
-    width: cx(100),
-    height: cx(100),
-    backgroundColor: '#409eff',
-    borderRadius: cx(4),
-    margin: cx(8),
-  },
-  sceneItemText: {
-    fontSize: cx(18),
-    color: '#fff',
   },
 });
 

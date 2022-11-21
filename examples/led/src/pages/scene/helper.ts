@@ -51,7 +51,7 @@ export function putSetScene(item) {
 
 export function getSceneId(scene, current) {
   let result = 3;
-  const currentScenes = scene[current];
+  const currentScenes = scene[current] || [];
   const currentIds = currentScenes.map(item => item.id);
 
   const sortIds = currentIds.sort();

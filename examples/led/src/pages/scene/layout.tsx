@@ -15,7 +15,7 @@ import React, { useRef, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { useSelector, actions } from '@models';
 
-import { color, icon } from '@config';
+import { color, icon, productConfig } from '@config';
 
 import LightSettingModal from '@components/lightSettingModal';
 import Strings from '@i18n';
@@ -124,6 +124,7 @@ const Layout: React.FC = props => {
         type: 'edit-scene',
         name: item.name,
         setting: item.setting,
+        multiwaySwitch: item.multiwaySwitch,
       });
   }
 
@@ -156,8 +157,8 @@ const Layout: React.FC = props => {
       });
       setActiveId(id);
     } else {
-      const items = scene[current].filter(s => s.id === id);
-      if (items.length > 0) {
+      const items = scene[current]?.filter(s => s.id === id);
+      if (items && items.length > 0) {
         putSetScene(items[0]);
         setActiveId(id);
       } else {

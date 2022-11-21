@@ -2,7 +2,7 @@ import _ from 'lodash';
 import { Store } from 'redux';
 import React, { Component } from 'react';
 import { Provider } from 'react-redux';
-import { View, AsyncStorage } from 'react-native';
+import { View, AsyncStorage, StatusBar } from 'react-native';
 import { TYSdk, Theme, DevInfo, DpValue, ControllerBar } from 'tuya-panel-kit';
 import { Connect } from '@components';
 import { actions, useSelector } from '@models';
@@ -101,7 +101,7 @@ const composeLayout = (store: Store, component: React.ComponentType) => {
             } else {
               dispatch(actions.product.changeCurrent('RB'));
               setTimeout(() => {
-                TYSdk.Navigator.push({
+                TYSdk.Navigator.replace({
                   id: 'switch-product',
                 });
               }, 0);
@@ -171,9 +171,10 @@ const composeLayout = (store: Store, component: React.ComponentType) => {
                             // type: 'primary',
                             // text: '灯光',
                             onPress: () => {
-                              TYSdk.Navigator.push({
+                              TYSdk.Navigator.replace({
                                 id: 'main',
                                 title: 'light setting',
+                                // renderStatusBar: () => <StatusBar barStyle="default" />,
                               });
                               TYSdk.device.putDeviceData({
                                 work_mode: 'white',
@@ -188,9 +189,11 @@ const composeLayout = (store: Store, component: React.ComponentType) => {
                             // type: 'primary',
                             // text: '渐变',
                             onPress: () =>
-                              TYSdk.Navigator.push({
+                              TYSdk.Navigator.replace({
                                 id: 'switch-gradient',
                                 title: 'switch gradient',
+
+                                // renderStatusBar: () => <StatusBar barStyle="default" />,
                               }),
                           },
                           {
@@ -200,9 +203,11 @@ const composeLayout = (store: Store, component: React.ComponentType) => {
                             iconColor: color.primary,
                             // text: '场景',
                             onPress: () => {
-                              TYSdk.Navigator.push({
+                              TYSdk.Navigator.replace({
                                 id: 'scene',
                                 title: 'scene',
+
+                                // renderStatusBar: () => <StatusBar barStyle="default" />,
                               });
                               TYSdk.device.putDeviceData({
                                 work_mode: 'scene',
@@ -216,9 +221,11 @@ const composeLayout = (store: Store, component: React.ComponentType) => {
                             iconColor: color.primary,
                             // text: '定时',
                             onPress: () =>
-                              TYSdk.Navigator.push({
+                              TYSdk.Navigator.replace({
                                 id: 'timer',
                                 title: 'timer',
+
+                                // renderStatusBar: () => <StatusBar barStyle="default" />,
                               }),
                           },
                         ]}

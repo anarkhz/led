@@ -97,7 +97,7 @@ export function putDeleteTimer(id, running = false) {
 
 export function getTimerId(timer, current) {
   let result = 1;
-  const currentTimers = timer[current];
+  const currentTimers = timer[current] || [];
   const currentIds = currentTimers.map(item => item.id);
 
   const sortIds = currentIds.sort();
