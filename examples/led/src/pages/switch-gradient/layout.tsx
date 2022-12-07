@@ -28,8 +28,8 @@ const Layout: React.FC = () => {
     TYSdk.device.putDeviceData({
       switch_gradient:
         '00' +
-        (Math.round(time) * 60).toString(16).padStart(6, '0') +
-        (Math.round(time) * 60).toString(16).padStart(6, '0'),
+        (Math.round(time) * 60*1000).toString(16).padStart(6, '0') +
+        (Math.round(time) * 60*1000).toString(16).padStart(6, '0'),
     });
   }
 

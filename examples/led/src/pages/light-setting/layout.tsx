@@ -24,6 +24,7 @@ import Strings from '@i18n';
 
 const { channelSchemaMap, schemaChanelMap } = productConfig.maps;
 const { switchSchema } = productConfig;
+// const { defaultSetting} = productConfig.defaultSetting;
 
 const { convertX: cx, width: deviceWidth, height: deviceHeight } = Utils.RatioUtils;
 
@@ -88,7 +89,37 @@ const Layout: React.FC = () => {
 
   const handleControlValueChange = _.debounce((key, value) => {
     TYSdk.device.putDeviceData({ [key]: Math.round(value) * 10 });
-    setRecommendSource(Res.cat);
+    if(current=="RB"){
+      if(key=="red_bright_value"){
+          if(controlItemValueGetter("blue_bright_value")==1||controlItemValueGetter("red_bright_value")==1){
+                setRecommendSource(Res.recommend.RBR);
+          }else{
+            setRecommendSource(Res.recommend.RBRB);
+          }
+      }else if(key=="blue_bright_value"){
+        if(controlItemValueGetter("red_bright_value")==1||controlItemValueGetter("blue_bright_value")==1){
+              setRecommendSource(Res.recommend.RBB);
+        }else{
+          setRecommendSource(Res.recommend.RBRB);
+        }
+    }
+    }else if(current=="RW"){
+
+      if(key=="red_bright_value"){
+          if(controlItemValueGetter("bright_value")==1||controlItemValueGetter("red_bright_value")==1){
+                setRecommendSource(Res.recommend.RWR);
+          }else{
+            setRecommendSource(Res.recommend.RWRW);
+          }
+      }else if(key=="bright_value"){
+        if(controlItemValueGetter("red_bright_value")==1||controlItemValueGetter("bright_value")==1){
+          setRecommendSource(Res.recommend.RWW);
+        }else{
+          setRecommendSource(Res.recommend.RWRW);
+        }
+    }
+  }
+  
   }, 200);
 
   const handlePressMore = () => {
