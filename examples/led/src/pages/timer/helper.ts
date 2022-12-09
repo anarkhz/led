@@ -44,7 +44,7 @@ function getStartActionBytes(item) {
   });
 
   const other = '00000000'; // uva 循环开关 / 开时长 / 关时长 / 00
-
+  //const other = '0202'; // uva 循环开关 / 开时长 / 关时长 / 00
   return (
     '09' +
     (result.bright_value || '') +
@@ -62,8 +62,9 @@ function getEndTimeBytes(item) {
 
 export function putSetTimer(id, item, running) {
   const rtc_running_id = getIdSwitchBytes(id, running);
-  const rtc_timer_type = '01';
+  const rtc_timer_type = '02'; //定时类型
   const rtc_loop = getLoopBytes(item);
+  const rtc_time_type = '00'; //时间类型
   const rtc_start_time = getStartTimeBytes(item);
   const rtc_start_action = getStartActionBytes(item);
   const rtc_end_time = getEndTimeBytes(item);
@@ -73,11 +74,15 @@ export function putSetTimer(id, item, running) {
     rtc_running_id +
     rtc_timer_type +
     rtc_loop +
+    rtc_time_type+
     rtc_start_time +
     rtc_start_action +
     rtc_end_time +
     rtc_end_action;
 
+    console.log(rtc_start_action);
+
+    console.log(result.toUpperCase())
   TYSdk.device.putDeviceData({
     rtc_timer: result.toUpperCase(),
     // timer_report: binStrToHex(rtc_bin_running + rtc_bin_id, 2),
