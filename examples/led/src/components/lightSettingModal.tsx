@@ -153,38 +153,55 @@ const Layout = forwardRef((props, ref) => {
     }
   };
 
-  const renderRecommend = () => {
-    if (productConfig.recommend[current] && productConfig.recommend[current].length > 0) {
+  const renderRecommend = recommendConfig => {
+    if (recommendConfig && recommendConfig.list && recommendConfig.list.length > 0) {
       return (
-        <View>
-          <View style={commonStyles.card}>
-            <TYText
-              style={{
-                fontSize: 18,
-                marginBottom: cx(8),
-                color: color.text,
-              }}
-              text="光质推荐"
-            />
-            <View style={styles.buttonList}>
-              {productConfig.recommend[current].map(item => (
-                <Button
-                  textStyle={styles.buttonItemText}
-                  style={styles.buttonItem}
-                  text={item.text}
-                  onPress={() => handleRecommendPress(item)}
-                ></Button>
-              ))}
-            </View>
-          </View>
-          <View style={[commonStyles.card, { padding: 0 }]}>
-            <Image style={styles.banner} source={recommendSource} />
+        <View style={commonStyles.card}>
+          <TYText
+            style={{
+              fontSize: 18,
+              marginBottom: cx(8),
+              color: color.text,
+            }}
+            // text={Strings.getLang('recommend_light')}
+            text={recommendConfig.title}
+          />
+          <View style={styles.buttonList}>
+            {recommendConfig.list.map(item => (
+              <Button
+                textStyle={styles.buttonItemText}
+                style={styles.buttonItem}
+                text={item.text}
+                onPress={() => handleRecommendPress(item)}
+              ></Button>
+            ))}
           </View>
         </View>
       );
     } else {
       return null;
     }
+  };
+
+  const renderRecommendItems = () => {
+    const renderComponent = productConfig.recommend[current].map(item => renderRecommend(item));
+    return (
+      <View>
+        {renderComponent}
+        <View style={commonStyles.card}>
+          <TYText
+            style={{
+              fontSize: 18,
+              marginBottom: cx(8),
+              color: color.text,
+            }}
+            // text={Strings.getLang('recommend_light')}
+            text={'光谱参考'}
+          />
+          <Image style={styles.banner} source={recommendSource} />
+        </View>
+      </View>
+    );
   };
 
   const renderControl = () => {
@@ -284,7 +301,7 @@ const Layout = forwardRef((props, ref) => {
       >
         <ScrollView style={{ marginBottom: cx(56) }}>
           {renderNameInput()}
-          {renderRecommend()}
+          {renderRecommendItems()}
           {renderControl()}
         </ScrollView>
         <View

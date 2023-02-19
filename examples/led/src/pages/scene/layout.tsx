@@ -211,6 +211,7 @@ const Layout: React.FC = props => {
       </View>
     );
   };
+
   const renderSceneItems = () => {
     if (scene && scene[current] && scene[current].length > 0) {
       return (
@@ -273,19 +274,58 @@ const Layout: React.FC = props => {
     );
   };
 
+  const renderSceneItems1 = () => {
+    if (scene && scene[current] && scene[current].length > 0) {
+      return (
+        <View style={styles.sceneItems}>
+          {scene[current].map((item, index) => {
+            return (
+              <View style={styles.sceneItemWrap}>
+                <Button
+                  textStyle={styles.sceneItemText}
+                  style={styles.sceneItem}
+                  text={item.name}
+                  onPress={() => handleScenePress(item, index)}
+                ></Button>
+                <SwitchButton
+                  value={activeId === item.id}
+                  size={{
+                    activeSize: 18,
+                    margin: 5,
+                    width: 52,
+                    height: 28,
+                    borderRadius: 10,
+                  }}
+                  theme={{ onTintColor: '#57BCFB', onThumbTintColor: '#FFF' }}
+                  thumbStyle={{ width: 18, height: 18, borderRadius: 6 }}
+                  onText="ON"
+                  offText="OFF"
+                  onValueChange={v => (v ? setCurrentScene(item.id) : setCurrentScene(0))}
+                />
+              </View>
+            );
+          })}
+        </View>
+      );
+    } else {
+      return null;
+    }
+  };
+
   return (
     <View style={{ flex: 1 }}>
       <ScrollView>
-        <TYText style={styles.title} text="推荐" />
-        {renderRecommendSceneItems()}
-        <TYText
+        {/* <TYText style={styles.title} text="推荐" />
+        {renderRecommendSceneItems()} */}
+        {/* <TYText
           style={{
             ...styles.title,
             display: scene && scene[current] && scene[current].length > 0 ? 'flex' : 'none',
           }}
-          text="自定义"
-        />
-        {renderSceneItems()}
+          text="自定义场景"
+        /> */}
+        {/* {renderSceneItems()} */}
+        {renderSceneItems1()}
       </ScrollView>
       {renderAddButton()}
       <LightSettingModal
@@ -305,30 +345,30 @@ const styles = StyleSheet.create({
     color: color.text,
   },
   /* Scene Items */
-  sceneItems: {
-    display: 'flex',
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    paddingHorizontal: cx(12),
-    paddingTop: cx(6),
-    paddingBottom: cx(80),
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
-    shadowOpacity: 0.5,
-    shadowRadius: 8,
-  },
-  sceneItem: {
-    width: cx(100),
-    height: cx(100),
-    backgroundColor: '#409eff',
-    borderRadius: cx(4),
-    margin: cx(8),
-  },
+  // sceneItems: {
+  //   display: 'flex',
+  //   flexDirection: 'row',
+  //   flexWrap: 'wrap',
+  //   paddingHorizontal: cx(12),
+  //   paddingTop: cx(6),
+  //   paddingBottom: cx(80),
+  //   alignItems: 'center',
+  //   justifyContent: 'space-between',
+  //   shadowColor: '#000',
+  //   shadowOffset: {
+  //     width: 0,
+  //     height: 1,
+  //   },
+  //   shadowOpacity: 0.5,
+  //   shadowRadius: 8,
+  // },
+  // sceneItem: {
+  //   width: cx(100),
+  //   height: cx(100),
+  //   backgroundColor: '#409eff',
+  //   borderRadius: cx(4),
+  //   margin: cx(8),
+  // },
   // 占位调整布局用，无实际意义
   scenePlaceItems: {
     width: cx(100),
@@ -338,6 +378,35 @@ const styles = StyleSheet.create({
   sceneItemText: {
     fontSize: cx(18),
     color: '#fff',
+  },
+  /* New Scene Items */
+  sceneItems: {
+    paddingTop: cx(6),
+    paddingBottom: cx(80),
+  },
+  sceneItemWrap: {
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: cx(12),
+    // flexWrap: 'wrap',
+    // paddingTop: cx(6),
+    // paddingBottom: cx(80),
+    // shadowColor: '#000',
+    // shadowOffset: {
+    //   width: 0,
+    //   height: 1,
+    // },
+    // shadowOpacity: 0.5,
+    // shadowRadius: 8,
+  },
+  sceneItem: {
+    width: cx(200),
+    height: cx(80),
+    backgroundColor: '#409eff',
+    borderRadius: cx(4),
+    margin: cx(8),
   },
 });
 

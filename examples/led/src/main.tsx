@@ -29,12 +29,12 @@ type Props = ReduxState & { dispatch: Dispatch };
 //   console.log('TYSdk :', TYSdk);
 // }
 
-const topBarRenderer = (isPop = false) => (
+const topBarRenderer = ({ isPop = false, title = '' }) => (
   <TopBar
     style={{ height: 48 }}
     contentStyle={{ height: 48, marginTop: 0 }}
     background="#fff"
-    title={'头部栏'}
+    title={title}
     color="red"
     titleStyle={{
       color: '#4C4C4C',
@@ -61,43 +61,43 @@ const routers = [
     id: 'main',
     title: '灯光设置',
     component: props => <LightSetting {...props} />,
-    topBar: topBarRenderer(),
+    topBar: topBarRenderer({ title: '灯光设置' }),
   },
   {
     id: 'switch-product',
     title: '选择产品',
     component: props => <SwitchProduct {...props} />,
-    topBar: topBarRenderer(),
+    topBar: topBarRenderer({ title: '选择产品' }),
   },
   {
     id: 'switch-gradient',
     title: '灯光渐变',
     component: props => <SwitchGradient {...props} />,
-    topBar: topBarRenderer(),
+    topBar: topBarRenderer({ title: '灯光渐变' }),
   },
   {
     id: 'scene',
     title: '我的场景',
     component: props => <Scene {...props} />,
-    topBar: topBarRenderer(),
+    topBar: topBarRenderer({ title: '我的场景' }),
   },
   {
     id: 'timer',
     title: '定时设置',
     component: props => <Timer {...props} />,
-    topBar: topBarRenderer(),
+    topBar: topBarRenderer({ title: '定时设置' }),
   },
   {
     id: 'timer-add',
     title: '添加定时',
     component: props => <TimerAdd {...props} />,
-    topBar: topBarRenderer(true),
+    topBar: topBarRenderer({ isPop: true, title: '添加定时' }),
   },
   {
     id: 'timer-edit',
     title: '编辑定时',
     component: props => <TimerEdit {...props} />,
-    topBar: topBarRenderer(true),
+    topBar: topBarRenderer({ isPop: true, title: '编辑定时' }),
   },
   // {
   //   id: 'home',

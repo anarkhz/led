@@ -89,37 +89,47 @@ const Layout: React.FC = () => {
 
   const handleControlValueChange = _.debounce((key, value) => {
     TYSdk.device.putDeviceData({ [key]: Math.round(value) * 10 });
-    if(current=="RB"){
-      if(key=="red_bright_value"){
-          if(controlItemValueGetter("blue_bright_value")==1||controlItemValueGetter("red_bright_value")==1){
-                setRecommendSource(Res.recommend.RBR);
-          }else{
-            setRecommendSource(Res.recommend.RBRB);
-          }
-      }else if(key=="blue_bright_value"){
-        if(controlItemValueGetter("red_bright_value")==1||controlItemValueGetter("blue_bright_value")==1){
-              setRecommendSource(Res.recommend.RBB);
-        }else{
+    if (current == 'RB') {
+      if (key == 'red_bright_value') {
+        if (
+          controlItemValueGetter('blue_bright_value') == 1 ||
+          controlItemValueGetter('red_bright_value') == 1
+        ) {
+          setRecommendSource(Res.recommend.RBR);
+        } else {
           setRecommendSource(Res.recommend.RBRB);
         }
-    }
-    }else if(current=="RW"){
-
-      if(key=="red_bright_value"){
-          if(controlItemValueGetter("bright_value")==1||controlItemValueGetter("red_bright_value")==1){
-                setRecommendSource(Res.recommend.RWR);
-          }else{
-            setRecommendSource(Res.recommend.RWRW);
-          }
-      }else if(key=="bright_value"){
-        if(controlItemValueGetter("red_bright_value")==1||controlItemValueGetter("bright_value")==1){
-          setRecommendSource(Res.recommend.RWW);
-        }else{
+      } else if (key == 'blue_bright_value') {
+        if (
+          controlItemValueGetter('red_bright_value') == 1 ||
+          controlItemValueGetter('blue_bright_value') == 1
+        ) {
+          setRecommendSource(Res.recommend.RBB);
+        } else {
+          setRecommendSource(Res.recommend.RBRB);
+        }
+      }
+    } else if (current == 'RW') {
+      if (key == 'red_bright_value') {
+        if (
+          controlItemValueGetter('bright_value') == 1 ||
+          controlItemValueGetter('red_bright_value') == 1
+        ) {
+          setRecommendSource(Res.recommend.RWR);
+        } else {
           setRecommendSource(Res.recommend.RWRW);
         }
+      } else if (key == 'bright_value') {
+        if (
+          controlItemValueGetter('red_bright_value') == 1 ||
+          controlItemValueGetter('bright_value') == 1
+        ) {
+          setRecommendSource(Res.recommend.RWW);
+        } else {
+          setRecommendSource(Res.recommend.RWRW);
+        }
+      }
     }
-  }
-  
   }, 200);
 
   const handlePressMore = () => {
@@ -182,38 +192,86 @@ const Layout: React.FC = () => {
   /**
    * Renders
    */
-  const renderRecommend = () => {
-    if (productConfig.recommend[current] && productConfig.recommend[current].length > 0) {
+  const renderSwitch = () => {
+    const switchText = Strings.getLang('on') + '/' + Strings.getLang('off');
+    return (
+      <View style={[commonStyles.card, commonStyles.line]}>
+        <TYText
+          style={{
+            fontSize: 18,
+            marginBottom: cx(8),
+            color: color.text,
+          }}
+          text={switchText}
+        />
+        <SwitchButton
+          size={{
+            activeSize: 34,
+            margin: 3,
+            width: 78,
+            height: 40,
+            borderRadius: 16,
+          }}
+          theme={{ onTintColor: '#57BCFB', onThumbTintColor: '#FFF' }}
+          thumbStyle={{ width: 34, height: 34, borderRadius: 14 }}
+          switchType="thumbMore"
+          value={dpState.switch_led}
+          onValueChange={v => TYSdk.device.putDeviceData({ switch_led: v })}
+          tintColor="#E5E5E5"
+        />
+      </View>
+    );
+  };
+
+  const renderRecommend = recommendConfig => {
+    if (recommendConfig && recommendConfig.list && recommendConfig.list.length > 0) {
       return (
-        <View>
-          <View style={commonStyles.card}>
-            <TYText
-              style={{
-                fontSize: 18,
-                marginBottom: cx(8),
-                color: color.text,
-              }}
-              text={Strings.getLang('recommend_light')}
-            />
-            <View style={styles.buttonList}>
-              {productConfig.recommend[current].map(item => (
-                <Button
-                  textStyle={styles.buttonItemText}
-                  style={styles.buttonItem}
-                  text={item.text}
-                  onPress={() => handleRecommendPress(item)}
-                ></Button>
-              ))}
-            </View>
-          </View>
-          <View style={[commonStyles.card, { padding: 0 }]}>
-            <Image style={styles.banner} source={recommendSource} />
+        <View style={commonStyles.card}>
+          <TYText
+            style={{
+              fontSize: 18,
+              marginBottom: cx(8),
+              color: color.text,
+            }}
+            // text={Strings.getLang('recommend_light')}
+            text={recommendConfig.title}
+          />
+          <View style={styles.buttonList}>
+            {recommendConfig.list.map(item => (
+              <Button
+                textStyle={styles.buttonItemText}
+                style={styles.buttonItem}
+                text={item.text}
+                onPress={() => handleRecommendPress(item)}
+              ></Button>
+            ))}
           </View>
         </View>
       );
     } else {
       return null;
     }
+  };
+
+  const renderRecommendItems = () => {
+    const renderComponent = productConfig.recommend[current].map(item => renderRecommend(item));
+    return (
+      <View>
+        {renderComponent}
+        <View style={commonStyles.card}>
+          <TYText
+            style={{
+              fontSize: 18,
+              marginBottom: cx(8),
+              color: color.text,
+            }}
+            // text={Strings.getLang('recommend_light')}
+            text={'光谱参考'}
+          />
+          <Image style={styles.banner} source={recommendSource} />
+        </View>
+      </View>
+    );
   };
 
   const renderControl = () => {
@@ -321,40 +379,42 @@ const Layout: React.FC = () => {
     );
   });
 
-  const renderOperation = () => {
-    return (
-      <View style={[commonStyles.card, commonStyles.line]}>
-        <SwitchButton
-          size={{
-            activeSize: 34,
-            margin: 3,
-            width: 78,
-            height: 40,
-            borderRadius: 16,
-          }}
-          theme={{ onTintColor: '#57BCFB', onThumbTintColor: '#FFF' }}
-          thumbStyle={{ width: 34, height: 34, borderRadius: 14 }}
-          switchType="thumbMore"
-          value={dpState.switch_led}
-          onValueChange={v => TYSdk.device.putDeviceData({ switch_led: v })}
-          tintColor="#E5E5E5"
-        />
-        <Button
-          style={[commonStyles.button, { width: cx(120) }]}
-          textStyle={commonStyles.buttonText}
-          text={Strings.getLang('more')}
-          onPress={handlePressMore}
-        ></Button>
-      </View>
-    );
-  };
+  // const renderOperation = () => {
+  //   return (
+  //     <View style={[commonStyles.card, commonStyles.line]}>
+  //       <SwitchButton
+  //         size={{
+  //           activeSize: 34,
+  //           margin: 3,
+  //           width: 78,
+  //           height: 40,
+  //           borderRadius: 16,
+  //         }}
+  //         theme={{ onTintColor: '#57BCFB', onThumbTintColor: '#FFF' }}
+  //         thumbStyle={{ width: 34, height: 34, borderRadius: 14 }}
+  //         switchType="thumbMore"
+  //         value={dpState.switch_led}
+  //         onValueChange={v => TYSdk.device.putDeviceData({ switch_led: v })}
+  //         tintColor="#E5E5E5"
+  //       />
+  //       <Button
+  //         style={[commonStyles.button, { width: cx(120) }]}
+  //         textStyle={commonStyles.buttonText}
+  //         text={Strings.getLang('more')}
+  //         onPress={handlePressMore}
+  //       ></Button>
+  //     </View>
+  //   );
+  // };
 
   return (
     <View style={{ flex: 1 }}>
       <ScrollView>
-        {renderRecommend()}
+        {renderSwitch()}
+        {renderRecommendItems()}
+        {/* {renderRecommend()} */}
         {renderControl()}
-        {renderOperation()}
+        {/* {renderOperation()} */}
       </ScrollView>
     </View>
   );
