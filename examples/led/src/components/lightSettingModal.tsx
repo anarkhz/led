@@ -93,7 +93,7 @@ const Layout = forwardRef((props, ref) => {
    * Handlers
    */
   const handleRecommendPress = item => {
-    TYSdk.device.putDeviceData(item.setting);
+    // TYSdk.device.putDeviceData(item.setting);
     setRecommendSource(item.img);
   };
 

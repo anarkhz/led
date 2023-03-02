@@ -45,11 +45,21 @@ const Layout: React.FC = props => {
       if (dpState.plant_scene_data) {
         const id = parseInt(dpState.plant_scene_data.substr(0, 2), 16);
         setCurrentScene(id);
-      } else {
-        setCurrentScene(0);
       }
+      // 不设置兜底
+      // else {
+      //   setCurrentScene(0);
+      // }
     }
   }, 0);
+
+  function changeWorkMode() {
+    if (dpState.work_mode !== 'scene') {
+      TYSdk.device.putDeviceData({
+        work_mode: 'scene',
+      });
+    }
+  }
 
   /**
    * Handlers
@@ -84,6 +94,7 @@ const Layout: React.FC = props => {
       onSelect: (value, { close: popupClose }) => {
         if (value === 'use') {
           popupClose();
+          changeWorkMode();
           setCurrentScene(item.id);
         } else if (value === 'edit') {
           popupClose();
@@ -150,6 +161,14 @@ const Layout: React.FC = props => {
     }
   }
 
+  function handleSwitchScene(switchValue, sceneItem) {
+    if (switchValue) {
+      setCurrentScene(sceneItem.id);
+    } else {
+      setCurrentScene(0);
+    }
+  }
+
   const setCurrentScene = id => {
     if (id === 0 || id === 1 || id === 2) {
       TYSdk.device.putDeviceData({
@@ -161,7 +180,9 @@ const Layout: React.FC = props => {
       if (items && items.length > 0) {
         putSetScene(items[0]);
         setActiveId(id);
-      } else {
+      }
+      // 取消默认设置
+      else {
         TYSdk.device.putDeviceData({
           plant_scene_data: '00',
         });
@@ -173,44 +194,44 @@ const Layout: React.FC = props => {
   /**
    * Renders
    */
-  const renderRecommendSceneItems = () => {
-    const items = [
-      {
-        name: '幼苗期',
-        value: '00',
-        id: 0,
-      },
-      {
-        name: '成长期',
-        value: '01',
-        id: 1,
-      },
-      {
-        name: '开花期',
-        value: '02',
-        id: 2,
-      },
-    ];
-    return (
-      <View style={styles.sceneItems}>
-        {items.map((item, index) => {
-          return (
-            <Button
-              textStyle={styles.sceneItemText}
-              style={{
-                ...styles.sceneItem,
-                backgroundColor: activeId === item.id ? color.dark : '#409eff',
-              }}
-              text={item.name}
-              onPress={() => setCurrentScene(item.id)}
-            ></Button>
-          );
-        })}
-        <Button style={styles.scenePlaceItems} />
-        <Button style={styles.scenePlaceItems} />
-      </View>
-    );
-  };
+  // const renderRecommendSceneItems = () => {
+  //   const items = [
+  //     {
+  //       name: '幼苗期',
+  //       value: '00',
+  //       id: 0,
+  //     },
+  //     {
+  //       name: '成长期',
+  //       value: '01',
+  //       id: 1,
+  //     },
+  //     {
+  //       name: '开花期',
+  //       value: '02',
+  //       id: 2,
+  //     },
+  //   ];
+  //   return (
+  //     <View style={styles.sceneItems}>
+  //       {items.map((item, index) => {
+  //         return (
+  //           <Button
+  //             textStyle={styles.sceneItemText}
+  //             style={{
+  //               ...styles.sceneItem,
+  //               backgroundColor: activeId === item.id ? color.dark : '#409eff',
+  //             }}
+  //             text={item.name}
+  //             onPress={() => setCurrentScene(item.id)}
+  //           ></Button>
+  //         );
+  //       })}
+  //       <Button style={styles.scenePlaceItems} />
+  //       <Button style={styles.scenePlaceItems} />
+  //     </View>
+  //   );
+  // };
 
   const renderSceneItems = () => {
     if (scene && scene[current] && scene[current].length > 0) {
@@ -300,7 +321,7 @@ const Layout: React.FC = props => {
                   thumbStyle={{ width: 18, height: 18, borderRadius: 6 }}
                   onText="ON"
                   offText="OFF"
-                  onValueChange={v => (v ? setCurrentScene(item.id) : setCurrentScene(0))}
+                  onValueChange={v => handleSwitchScene(v, item)}
                 />
               </View>
             );

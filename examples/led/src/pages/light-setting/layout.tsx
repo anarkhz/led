@@ -35,6 +35,14 @@ const Layout: React.FC = () => {
   const dispatch = useDispatch();
   const [recommendSource, setRecommendSource] = React.useState(Res.cat);
 
+  function changeWorkMode() {
+    if (dpState.work_mode !== 'white') {
+      TYSdk.device.putDeviceData({
+        work_mode: 'white',
+      });
+    }
+  }
+
   /**
    * Getters
    */
@@ -83,11 +91,13 @@ const Layout: React.FC = () => {
    * Handlers
    */
   const handleRecommendPress = item => {
+    changeWorkMode();
     TYSdk.device.putDeviceData(item.setting);
     setRecommendSource(item.img);
   };
 
   const handleControlValueChange = _.debounce((key, value) => {
+    changeWorkMode();
     TYSdk.device.putDeviceData({ [key]: Math.round(value) * 10 });
     if (current == 'RB') {
       if (key == 'red_bright_value') {
@@ -184,6 +194,7 @@ const Layout: React.FC = () => {
     });
     const putData = result.sort().join('');
 
+    changeWorkMode();
     TYSdk.device.putDeviceData({
       multiway_switch: putData,
     });
@@ -216,7 +227,7 @@ const Layout: React.FC = () => {
           thumbStyle={{ width: 34, height: 34, borderRadius: 14 }}
           switchType="thumbMore"
           value={dpState.switch_led}
-          onValueChange={v => TYSdk.device.putDeviceData({ switch_led: v })}
+          onValueChange={v => changeWorkMode() && TYSdk.device.putDeviceData({ switch_led: v })}
           tintColor="#E5E5E5"
         />
       </View>

@@ -1,36 +1,80 @@
 import { StyleSheet, View, ScrollView, TextInput } from 'react-native';
-import { TYSdk, Utils, Button, TYText, Slider, Stepper } from 'tuya-panel-kit';
+import { TYSdk, Utils, Button, TYText, Slider, Stepper, Dialog } from 'tuya-panel-kit';
 import React from 'react';
 
 import { commonStyles } from 'style/common';
 import { timeRecommend } from './service';
+import { useSelector, actions } from '@models';
+import {
+  switchGradientToSecondTime,
+  openTimeToText,
+  openTimeToSecondTime,
+  secondTimeToOpenTime,
+} from './helpers';
 
 const { convertX: cx } = Utils.RatioUtils;
 import Strings from '@i18n';
 const Layout: React.FC = () => {
-  const [openTime, setOpenTime] = React.useState(0);
+  const dpState = useSelector(state => state.dpState);
+  const secTime = switchGradientToSecondTime(dpState.switch_gradient);
+
+  const [openTime, setOpenTime] = React.useState(secondTimeToOpenTime(secTime));
+  const [secondTime, setSecondTime] = React.useState(0);
 
   /**
    * Handlers
    */
   function handleTimeChange(time) {
     setOpenTime(Math.round(time));
-    handlePutData(time);
+    // setSecondTime(openTimeToSecondTime(time));
   }
 
-  function handleInputChange(text) {
-    const time = Math.round(text) > 180 ? 180 : Math.round(text);
-    setOpenTime(time);
-    handlePutData(time);
+  function handleTimeComplete() {
+    handlePutData(openTimeToSecondTime(openTime));
   }
 
-  function handlePutData(time) {
+  // min 0 max 10800
+  function handleInputChange(t) {
+    console.log('change', t);
+    const time = Math.round(t) > 10800 ? 10800 : Math.round(t);
+    console.log('chang1e', time);
+    setSecondTime(time);
+  }
+
+  // time
+  function handlePutData(time, format = 1000) {
     TYSdk.device.putDeviceData({
       switch_gradient:
         '00' +
-        (Math.round(time) * 60*1000).toString(16).padStart(6, '0') +
-        (Math.round(time) * 60*1000).toString(16).padStart(6, '0'),
+        (Math.round(time) * format).toString(16).padStart(6, '0') +
+        (Math.round(time) * format).toString(16).padStart(6, '0'),
     });
+  }
+
+  function handleOpenDialog() {
+    // setSecondTime(openTimeToSecondTime(openTime));
+    // Dialog.custom({
+    //   title: '请输入渐变时间（秒）',
+    //   cancelText: '取消',
+    //   confirmText: '确认',
+    //   content: (
+    //     <View style={{ height: 80, alignItems: 'center', justifyContent: 'center' }}>
+    //       <TextInput
+    //         style={styles.titleInput}
+    //         keyboardType="numeric"
+    //         maxLength={5}
+    //         placeholder={Strings.getLang('input_switch_gradient_hint')}
+    //         value={setSecondTime.toString()}
+    //         onChangeText={v => setSecondTime(v)}
+    //       ></TextInput>
+    //     </View>
+    //   ),
+    //   onConfirm: (data, { close }) => {
+    //     close();
+    //     setOpenTime(secondTimeToOpenTime(secondTime));
+    //     handlePutData(secondTime, 1000);
+    //   },
+    // });
   }
 
   /**
@@ -40,14 +84,14 @@ const Layout: React.FC = () => {
     return (
       <View style={commonStyles.line}>
         <TYText text={Strings.getLang('switch_gradient')} size={18} />
-        <TextInput
+        {/* <TextInput
           style={styles.titleInput}
           keyboardType="numeric"
           maxLength={3}
           placeholder={Strings.getLang('input_switch_gradient_hint')}
           value={openTime.toString()}
           onChangeText={handleInputChange}
-        ></TextInput>
+        ></TextInput> */}
       </View>
     );
   };
@@ -60,7 +104,10 @@ const Layout: React.FC = () => {
             textStyle={styles.buttonItemText}
             style={styles.buttonItem}
             text={item + 'min'}
-            onPress={() => handleTimeChange(item)}
+            onPress={() => {
+              setOpenTime(secondTimeToOpenTime(item * 60));
+              handlePutData(item, 60 * 1000);
+            }}
           ></Button>
         ))}
       </View>
@@ -88,14 +135,27 @@ const Layout: React.FC = () => {
             minimumTrackTintColor: '#F84803',
             maximumTrackTintColor: '#E5E5E5',
           }}
-          maximumValue={180}
+          maximumValue={181}
           minimumValue={0}
           style={{ width: cx(140), height: cx(36) }}
           value={openTime}
-          onSlidingComplete={handleTimeChange}
+          onValueChange={handleTimeChange}
+          onSlidingComplete={handleTimeComplete}
         />
-        <Stepper
+        <TYText
           style={{
+            width: cx(84),
+            textAlign: 'center',
+            backgroundColor: '#eee',
+            padding: cx(4),
+            borderRadius: cx(4),
+          }}
+          text={openTimeToText(openTime)}
+          size={16}
+          onPress={() => handleOpenDialog()}
+        />
+        {/* <Stepper
+          style={{ 
             width: cx(92),
           }}
           max={180}
@@ -105,7 +165,7 @@ const Layout: React.FC = () => {
           value={openTime}
           editable={true}
           onValueChange={handleTimeChange}
-        />
+        /> */}
       </View>
     );
   };

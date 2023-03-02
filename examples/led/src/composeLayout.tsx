@@ -176,9 +176,9 @@ const composeLayout = (store: Store, component: React.ComponentType) => {
                                 title: 'light setting',
                                 // renderStatusBar: () => <StatusBar barStyle="default" />,
                               });
-                              TYSdk.device.putDeviceData({
-                                work_mode: 'white',
-                              });
+                              // TYSdk.device.putDeviceData({
+                              //   work_mode: 'white',
+                              // });
                             },
                           },
                           {
@@ -209,9 +209,9 @@ const composeLayout = (store: Store, component: React.ComponentType) => {
 
                                 // renderStatusBar: () => <StatusBar barStyle="default" />,
                               });
-                              TYSdk.device.putDeviceData({
-                                work_mode: 'scene',
-                              });
+                              // TYSdk.device.putDeviceData({
+                              //   work_mode: 'scene',
+                              // });
                             },
                           },
                           {
