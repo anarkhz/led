@@ -22,6 +22,8 @@ import { color, productConfig } from '@config';
 import Res from '@res';
 import Strings from '@i18n';
 
+import { slowStart } from '@utils/slowStart';
+
 const { channelSchemaMap, schemaChanelMap } = productConfig.maps;
 const { switchSchema } = productConfig;
 // const { defaultSetting} = productConfig.defaultSetting;
@@ -92,7 +94,8 @@ const Layout: React.FC = () => {
    */
   const handleRecommendPress = item => {
     changeWorkMode();
-    TYSdk.device.putDeviceData(item.setting);
+    slowStart(item.setting);
+    // TYSdk.device.putDeviceData(item.setting);
     setRecommendSource(item.img);
   };
 

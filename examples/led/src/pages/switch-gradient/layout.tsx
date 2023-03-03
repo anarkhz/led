@@ -19,7 +19,7 @@ const Layout: React.FC = () => {
   const secTime = switchGradientToSecondTime(dpState.switch_gradient);
 
   const [openTime, setOpenTime] = React.useState(secondTimeToOpenTime(secTime));
-  const [secondTime, setSecondTime] = React.useState(0);
+  const [inputTime, setInputTime] = React.useState('');
 
   /**
    * Handlers
@@ -33,14 +33,6 @@ const Layout: React.FC = () => {
     handlePutData(openTimeToSecondTime(openTime));
   }
 
-  // min 0 max 10800
-  function handleInputChange(t) {
-    console.log('change', t);
-    const time = Math.round(t) > 10800 ? 10800 : Math.round(t);
-    console.log('chang1e', time);
-    setSecondTime(time);
-  }
-
   // time
   function handlePutData(time, format = 1000) {
     TYSdk.device.putDeviceData({
@@ -52,29 +44,34 @@ const Layout: React.FC = () => {
   }
 
   function handleOpenDialog() {
-    // setSecondTime(openTimeToSecondTime(openTime));
-    // Dialog.custom({
-    //   title: '请输入渐变时间（秒）',
-    //   cancelText: '取消',
-    //   confirmText: '确认',
-    //   content: (
-    //     <View style={{ height: 80, alignItems: 'center', justifyContent: 'center' }}>
-    //       <TextInput
-    //         style={styles.titleInput}
-    //         keyboardType="numeric"
-    //         maxLength={5}
-    //         placeholder={Strings.getLang('input_switch_gradient_hint')}
-    //         value={setSecondTime.toString()}
-    //         onChangeText={v => setSecondTime(v)}
-    //       ></TextInput>
-    //     </View>
-    //   ),
-    //   onConfirm: (data, { close }) => {
-    //     close();
-    //     setOpenTime(secondTimeToOpenTime(secondTime));
-    //     handlePutData(secondTime, 1000);
-    //   },
-    // });
+    Dialog.prompt({
+      title: '请输入渐变时间（秒）',
+      cancelText: '取消',
+      confirmText: '确认',
+      value: inputTime,
+      placeholder: Strings.getLang('input_switch_gradient_hint'),
+      keyboardType: 'numeric',
+      inputMode: 'numeric',
+      onChangeText: text => {
+        console.log(text);
+        // 使用value props 可令prompt成为受控组件，控制其输入框内容
+        const t = +text;
+        if (typeof t === 'number' && !Number.isNaN(t)) {
+          if (Math.round(t) > 10800) {
+            return '10800';
+          } else {
+            return text;
+          }
+        }
+      },
+      onConfirm: (text, { close }) => {
+        const t = +text;
+        setInputTime(t);
+        setOpenTime(secondTimeToOpenTime(t));
+        handlePutData(t);
+        close();
+      },
+    });
   }
 
   /**
@@ -84,14 +81,6 @@ const Layout: React.FC = () => {
     return (
       <View style={commonStyles.line}>
         <TYText text={Strings.getLang('switch_gradient')} size={18} />
-        {/* <TextInput
-          style={styles.titleInput}
-          keyboardType="numeric"
-          maxLength={3}
-          placeholder={Strings.getLang('input_switch_gradient_hint')}
-          value={openTime.toString()}
-          onChangeText={handleInputChange}
-        ></TextInput> */}
       </View>
     );
   };
@@ -154,18 +143,6 @@ const Layout: React.FC = () => {
           size={16}
           onPress={() => handleOpenDialog()}
         />
-        {/* <Stepper
-          style={{ 
-            width: cx(92),
-          }}
-          max={180}
-          min={0}
-          buttonStyle={styles.stepButtonStyle}
-          inputStyle={styles.stepInputStyle}
-          value={openTime}
-          editable={true}
-          onValueChange={handleTimeChange}
-        /> */}
       </View>
     );
   };

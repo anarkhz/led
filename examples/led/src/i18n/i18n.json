@@ -83,7 +83,7 @@
     "cancel": "取消",
     "confirm": "确认",
     "switch_gradient": "开关渐变",
-    "input_switch_gradient_hint": "请输入渐变时间（分钟）",
+    "input_switch_gradient_hint": "请输入渐变时间（秒）",
     "time": "时间",
     "scene": "场景",
     "scene_name": "场景名字",
