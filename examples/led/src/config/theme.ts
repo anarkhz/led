@@ -9,8 +9,8 @@ export default {
     //   '3%': '#FF7E38',
     //   '90%': '#FF624C',
     // },
-    // background: '#F5F5F5',
-    background: '#d6fc51',
+     background: '#F5F5F5',
+ 
   },
 };
 

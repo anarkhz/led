@@ -161,48 +161,108 @@ export default {
           },
           img: Res.recommend.RB11,
         },
-      ],
-    },
-    {
-      title: '红蓝光质推荐',
-      list: [
         {
-          text: 'R:B=1:2',
+          text: 'R:B=2:1',
           setting: {
-            red_bright_value: 200,
-            blue_bright_value: 1000,
+            red_bright_value: 1000,
+            blue_bright_value: 800,
           },
-          img: Res.recommend.RB11,
+          img: Res.recommend.RB21,
+        },
+        {
+          text: 'R:B=3:1',
+          setting: {
+            red_bright_value: 1000,
+            blue_bright_value: 480,
+          },
+          img: Res.recommend.RB31,
+        },
+        {
+          text: 'R:B=4:1',
+          setting: {
+            red_bright_value: 1000,
+            blue_bright_value: 350,
+          },
+          img: Res.recommend.RB41,
         },
       ],
     },
     {
-      title: '红蓝光质推荐',
+      title: '红白光质推荐',
       list: [
         {
-          text: 'R:B=1:3',
+          text: 'R:W=1:1',
           setting: {
-            red_bright_value: 300,
+            red_bright_value: 560,
             blue_bright_value: 1000,
           },
           img: Res.recommend.RB11,
         },
+        {
+          text: 'R:W=2:1',
+          setting: {
+            red_bright_value: 1000,
+            blue_bright_value: 800,
+          },
+          img: Res.recommend.RB21,
+        },
+        {
+          text: 'R:W=3:1',
+          setting: {
+            red_bright_value: 1000,
+            blue_bright_value: 480,
+          },
+          img: Res.recommend.RB31,
+        },
+        {
+          text: 'R:W=4:1',
+          setting: {
+            red_bright_value: 1000,
+            blue_bright_value: 350,
+          },
+          img: Res.recommend.RB41,
+        },
       ],
-    },
+    }, 
+  ],
+  RBFr: [],
+  RW: [
     {
-      title: '红蓝光质推荐',
+      title: '红白光质推荐',
       list: [
         {
-          text: 'R:B=1:4',
+          text: 'R:W=1:1',
           setting: {
-            red_bright_value: 400,
+            red_bright_value: 560,
             blue_bright_value: 1000,
           },
           img: Res.recommend.RB11,
+        },
+        {
+          text: 'R:W=2:1',
+          setting: {
+            red_bright_value: 1000,
+            blue_bright_value: 800,
+          },
+          img: Res.recommend.RB21,
+        },
+        {
+          text: 'R:W=3:1',
+          setting: {
+            red_bright_value: 1000,
+            blue_bright_value: 480,
+          },
+          img: Res.recommend.RB31,
+        },
+        {
+          text: 'R:W=4:1',
+          setting: {
+            red_bright_value: 1000,
+            blue_bright_value: 350,
+          },
+          img: Res.recommend.RB41,
         },
       ],
     },
   ],
-  RBFr: [],
-  RW: [],
 };

@@ -49,7 +49,8 @@ const Layout: React.FC = () => {
       cancelText: '取消',
       confirmText: '确认',
       value: inputTime,
-      placeholder: Strings.getLang('input_switch_gradient_hint'),
+      laceholder: Strings.getLang('input_switch_gradient_hint'),
+      //laceholder:'请输入渐变时间（秒）',
       keyboardType: 'numeric',
       inputMode: 'numeric',
       onChangeText: text => {
