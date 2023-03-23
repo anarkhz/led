@@ -92,10 +92,10 @@ const Layout: React.FC = () => {
           <Button
             textStyle={styles.buttonItemText}
             style={styles.buttonItem}
-            text={item + 'min'}
+            text={item + 's'}
             onPress={() => {
-              setOpenTime(secondTimeToOpenTime(item * 60));
-              handlePutData(item, 60 * 1000);
+              setOpenTime(secondTimeToOpenTime(item));
+              handlePutData(item, 1000);
             }}
           ></Button>
         ))}

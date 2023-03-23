@@ -19,9 +19,7 @@ function getActionBytes(item) {
 
   Object.entries(setting).forEach(([key, value]) => {
     const swithStr = multiwaySwitch[key] ? '01' : '00';
-    const valueStr = Math.floor(value / 10)
-      .toString(16)
-      .padStart(2, '0');
+    const valueStr = Math.floor(value).toString(16).padStart(4, '0');
 
     result[key] = swithStr + valueStr;
   });
@@ -40,12 +38,15 @@ function getActionBytes(item) {
 
 export function putSetScene(item) {
   const scene_id = getIdBytes(item.id);
-  const scene_action = getActionBytes(item);
+  // const scene_action = getActionBytes(item);
 
-  const result = scene_id + scene_action;
+  // const result = scene_id + scene_action;
 
+  // TYSdk.device.putDeviceData({
+  //   plant_scene_data: result.toUpperCase(),
+  // });
   TYSdk.device.putDeviceData({
-    plant_scene_data: result.toUpperCase(),
+    plant_scene_data: scene_id,
   });
 }
 

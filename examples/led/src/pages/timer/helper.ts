@@ -74,15 +74,15 @@ export function putSetTimer(id, item, running) {
     rtc_running_id +
     rtc_timer_type +
     rtc_loop +
-    rtc_time_type+
+    rtc_time_type +
     rtc_start_time +
     rtc_start_action +
     rtc_end_time +
     rtc_end_action;
 
-    console.log(rtc_start_action);
+  console.log(rtc_start_action);
 
-    console.log(result.toUpperCase())
+  console.log(result.toUpperCase());
   TYSdk.device.putDeviceData({
     rtc_timer: result.toUpperCase(),
     // timer_report: binStrToHex(rtc_bin_running + rtc_bin_id, 2),

@@ -38,11 +38,11 @@ const Layout: React.FC = () => {
   const [recommendSource, setRecommendSource] = React.useState(Res.cat);
 
   function changeWorkMode() {
-    if (dpState.work_mode !== 'white') {
-      TYSdk.device.putDeviceData({
-        work_mode: 'white',
-      });
-    }
+    // if (dpState.work_mode !== 'white') {
+    //   TYSdk.device.putDeviceData({
+    //     work_mode: 'white',
+    //   });
+    // }
   }
 
   /**
@@ -230,7 +230,7 @@ const Layout: React.FC = () => {
           thumbStyle={{ width: 34, height: 34, borderRadius: 14 }}
           switchType="thumbMore"
           value={dpState.switch_led}
-          onValueChange={v => changeWorkMode() && TYSdk.device.putDeviceData({ switch_led: v })}
+          onValueChange={v => TYSdk.device.putDeviceData({ switch_led: v })}
           tintColor="#E5E5E5"
         />
       </View>
@@ -360,7 +360,6 @@ const Layout: React.FC = () => {
                 width: cx(92),
               }}
               max={100}
-              min={1}
               buttonStyle={styles.stepButtonStyle}
               inputStyle={styles.stepInputStyle}
               editable={true}

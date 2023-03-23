@@ -40,25 +40,25 @@ const Layout: React.FC = props => {
 
   const [activeId, setActiveId] = React.useState(-1);
 
-  setTimeout(() => {
-    if (activeId === -1) {
-      if (dpState.plant_scene_data) {
-        const id = parseInt(dpState.plant_scene_data.substr(0, 2), 16);
-        setCurrentScene(id);
-      }
-      // 不设置兜底
-      // else {
-      //   setCurrentScene(0);
-      // }
-    }
-  }, 0);
+  // setTimeout(() => {
+  //   if (activeId === -1) {
+  //     if (dpState.plant_scene_data) {
+  //       const id = parseInt(dpState.plant_scene_data.substr(0, 2), 16);
+  //       setCurrentScene(id);
+  //     }
+  //     // 不设置兜底
+  //     // else {
+  //     //   setCurrentScene(0);
+  //     // }
+  //   }
+  // }, 0);
 
   function changeWorkMode() {
-    if (dpState.work_mode !== 'scene') {
-      TYSdk.device.putDeviceData({
-        work_mode: 'scene',
-      });
-    }
+    // if (dpState.work_mode !== 'scene') {
+    //   TYSdk.device.putDeviceData({
+    //     work_mode: 'scene',
+    //   });
+    // }
   }
 
   /**
@@ -308,7 +308,7 @@ const Layout: React.FC = props => {
                   text={item.name}
                   onPress={() => handleScenePress(item, index)}
                 ></Button>
-                <SwitchButton
+                {/* <SwitchButton
                   value={activeId === item.id}
                   size={{
                     activeSize: 18,
@@ -322,7 +322,7 @@ const Layout: React.FC = props => {
                   onText="ON"
                   offText="OFF"
                   onValueChange={v => handleSwitchScene(v, item)}
-                />
+                /> */}
               </View>
             );
           })}

@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import { StyleSheet, View, Image, ScrollView, TouchableOpacity, TextInput } from 'react-native';
 import {
   TYSdk,
@@ -39,13 +40,26 @@ const Layout: React.FC = props => {
       const { startTime, endTime } = item;
       const allRunningTimers = timer[current]?.filter(item => item.running);
       const runningDuration = allRunningTimers?.map(item => [item.startTime, item.endTime]);
-      // const sortDuration = runningDuration.sort()
-      const target = runningDuration?.concat([startTime, endTime]);
-
-      if (target && target.flat().sort().join() === target.flat().join()) {
-        return true;
+      const target = runningDuration?.concat([[startTime, endTime]]);
+      // console.log('allRunningTimers', allRunningTimers);
+      // console.log('runningDuration', runningDuration);
+      // console.log('target', target);
+      if (allRunningTimers.length > 0) {
+        const validStr1 = _.cloneDeep(target)
+          .sort((a, b) => a[0] - b[0])
+          .flat()
+          .join();
+        const validStr2 = _.cloneDeep(target)
+          .flat()
+          .sort((a, b) => a - b)
+          .join();
+        if (target && validStr1 === validStr2) {
+          return true;
+        } else {
+          return false;
+        }
       } else {
-        return false;
+        return true;
       }
     }
     if (running && !isTimeVaild()) {

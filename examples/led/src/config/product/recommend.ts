@@ -149,7 +149,60 @@ export default {
     //   img: Res.recommend.RB91,
     // },
   ],
-  RBWFrUv: [],
+  RBWFrUv: [
+    {
+      title: '红蓝光质推荐',
+      list: [
+        {
+          text: 'R:B=1:1',
+          setting: {
+            red_bright_value: 560,
+            blue_bright_value: 1000,
+          },
+          img: Res.recommend.RB11,
+        },
+      ],
+    },
+    {
+      title: '红蓝光质推荐',
+      list: [
+        {
+          text: 'R:B=1:2',
+          setting: {
+            red_bright_value: 200,
+            blue_bright_value: 1000,
+          },
+          img: Res.recommend.RB11,
+        },
+      ],
+    },
+    {
+      title: '红蓝光质推荐',
+      list: [
+        {
+          text: 'R:B=1:3',
+          setting: {
+            red_bright_value: 300,
+            blue_bright_value: 1000,
+          },
+          img: Res.recommend.RB11,
+        },
+      ],
+    },
+    {
+      title: '红蓝光质推荐',
+      list: [
+        {
+          text: 'R:B=1:4',
+          setting: {
+            red_bright_value: 400,
+            blue_bright_value: 1000,
+          },
+          img: Res.recommend.RB11,
+        },
+      ],
+    },
+  ],
   RBFr: [],
   RW: [],
 };
